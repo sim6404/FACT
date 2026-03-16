@@ -1005,6 +1005,7 @@ function QualSec() {
       detected_by:String(row["발견자"]??row["detected_by"]??""),
       root_cause:String(row["근본원인"]??row["root_cause"]??null),
       action_taken:String(row["조치사항"]??row["action_taken"]??null),
+      resolved_at:(row["해결일"]!=null||row["resolved_at"]!=null)?String(row["해결일"]??row["resolved_at"]):null,
       customer_name:String(row["고객사"]??row["customer_name"]??null),
       remark:String(row["비고"]??row["remark"]??null),
     })));
@@ -1058,10 +1059,11 @@ function InvSec() {
       id:`imp-${Date.now()}-${i}`,
       item_code:String(row["품목코드"]??row["item_code"]??`IMP-${i+1}`),
       item_name:String(row["품목명"]??row["item_name"]??""),
+      spec:String(row["규격"]??row["spec"]??"")||null,
+      unit:String(row["단위"]??row["unit"]??"EA"),
       warehouse:String(row["창고"]??row["warehouse"]??""),
       stock_qty:Number(row["현재재고"]??row["stock_qty"]??0),
       safety_stock:Number(row["안전재고"]??row["safety_stock"]??0),
-      unit:String(row["단위"]??row["unit"]??"EA"),
       is_below_safety:Boolean(row["안전재고미달"]??row["is_below_safety"]??false),
       last_updated:String(row["최종수정일"]??row["last_updated"]??new Date().toISOString()),
     })));
