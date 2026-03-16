@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CSS 변수 (디자인 토큰) ─────────────────────────────────────────────────── */
+:root {
+  color-scheme: light;
+  --bg:        #f2f4f7;
+  --card:      #ffffff;
+  --border:    #e4e8ee;
+  --txt1:      #0d1117;
+  --txt2:      #5a6478;
+  --txt3:      #9aa3b2;
+  --primary:   #0d7f8a;
+  --sidebar:   #0a1628;
+  --sidebar2:  #0e1f38;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--txt1);
+  font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", -apple-system, Arial, sans-serif;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── 브라우저 기본 outline 제거 ──────────────────────────────────────────────── */
+* { box-sizing: border-box; }
+
+input, button, textarea, select {
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance:    none;
+  appearance:         none;
+}
+input:focus, button:focus, textarea:focus, select:focus {
+  outline: none;
+}
+
+/* ══ KPI 애니메이션 keyframes ════════════════════════════════════════════════ */
+
+/* 숫자 카운트업 — 아래서 올라오며 페이드인 */
+@keyframes kpi-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* 값 변경 시 잠깐 강조 pulse */
+@keyframes kpi-pulse {
+  0%   { transform: scale(1);    }
+  40%  { transform: scale(1.06); }
+  100% { transform: scale(1);    }
+}
+
+/* 스파크라인 선 그리기 */
+@keyframes spark-draw {
+  from { stroke-dashoffset: 600; }
+  to   { stroke-dashoffset: 0;   }
+}
+
+/* 스파크라인 영역 페이드인 */
+@keyframes spark-fill {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* 바 차트 막대 위로 자라기 */
+@keyframes bar-grow {
+  from { transform: scaleY(0); opacity: 0; }
+  to   { transform: scaleY(1); opacity: 1; }
+}
+
+/* 면적 차트 왼→오 reveal */
+@keyframes area-reveal {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0% 0 0); }
+}
+
+/* 카드 들어오기 */
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* 상태 점 깜빡임 */
+@keyframes live-dot {
+  0%, 100% { opacity: 1; transform: scale(1);    }
+  50%       { opacity: 0.4; transform: scale(0.7); }
+}
+
+/* 전체 배지 번쩍임 */
+@keyframes flash-green {
+  0%, 100% { background: rgba(16,185,129,0.12); color: #10b981; }
+  50%       { background: rgba(16,185,129,0.28); color: #059669; }
+}
+@keyframes flash-red {
+  0%, 100% { background: rgba(239,68,68,0.12); color: #ef4444; }
+  50%       { background: rgba(239,68,68,0.28); color: #dc2626; }
+}
+
+/* 편의 유틸 */
+.anim-card-in   { animation: card-in   0.45s cubic-bezier(.22,.68,0,1.2) both; }
+.anim-kpi-enter { animation: kpi-enter 0.5s  cubic-bezier(.22,.68,0,1.2) both; }
+.anim-kpi-pulse { animation: kpi-pulse 0.4s  ease-out; }
+.live-dot       { animation: live-dot  1.8s  ease-in-out infinite; }
+
+/* ── 인쇄 스타일 ─────────────────────────────────────────────────────────────── */
+@media print {
+  @page { size: A4 landscape; margin: 12mm 15mm; }
+
+  aside, header, .no-print, button, [data-no-print] { display: none !important; }
+
+  body { background: white !important; color: #000 !important; }
+
+  table { border-collapse: collapse; width: 100%; font-size: 9pt; }
+
+  th {
+    background-color: #0a2535 !important;
+    color: #fff !important;
+    padding: 5px 8px;
+    border: 1px solid #ccc;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  td { padding: 4px 8px; border: 1px solid #e5e7eb; font-size: 9pt; }
+
+  tr:nth-child(even) td {
+    background-color: #f7f8fc !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .shadow-sm, .shadow, .shadow-md, .shadow-lg, .shadow-xl { box-shadow: none !important; }
+}

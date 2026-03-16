@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>F.A.C.T Admin</title>
+    <meta name="description" content="F.A.C.T Admin Console" />
+  </head>
+  <body style="margin:0">
+    <div id="root"></div>
+    <div id="boot-error" style="display:none;padding:16px;margin:16px;border:1px solid #e53935;background:#ffebee;color:#b71c1c;font-family:monospace;font-size:12px;white-space:pre-wrap;"></div>
+
+    <!-- React / ReactDOM (UMD) -->
+    <script src="./vendor/react.production.min.js"></script>
+    <script src="./vendor/react-dom.production.min.js"></script>
+
+    <!-- Recharts (UMD) -->
+    <script src="./vendor/Recharts.min.js"></script>
+
+    <!-- Babel for in-browser JSX transform -->
+    <script src="./vendor/babel.min.js"></script>
+
+    <script>
+      (function () {
+        function showError(msg) {
+          var el = document.getElementById("boot-error");
+          if (!el) return;
+          el.style.display = "block";
+          el.textContent = msg;
+        }
+        window.addEventListener("error", function (e) {
+          showError("오류: " + (e && e.message ? e.message : e));
+        });
+        window.addEventListener("unhandledrejection", function (e) {
+          var reason = e && e.reason ? e.reason : "";
+          var msg = reason && reason.message ? reason.message : String(reason || e);
+          showError("오류: " + msg);
+        });
+        if (!window.React || !window.ReactDOM) {
+          showError("React 로드 실패. vendor 파일을 확인하세요.");
+        }
+      })();
+    </script>
+
+    <!-- App -->
+    <script type="text/babel" data-presets="env,react" src="./App.js"></script>
+  </body>
+</html>

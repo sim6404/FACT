@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+pydantic-settings
+sqlalchemy
+psycopg[binary]
+redis
+celery
+alembic
+snowflake-connector-python
+python-multipart
