@@ -1,15 +1,17 @@
 "use client";
-// ─── 품질 관리 섹션 ──────────────────────────────────────────────────────────
+// ─── 품질 관리 섹션 (코딩계획서 v1.0) ────────────────────────────────────────
+// 종합·BUSH·이너씰·댐퍼/혼플레이트·순고무·리워크·고객사 이슈
 
 import { useState, useMemo } from "react";
-import { Plus, RefreshCw, Printer, ShieldCheck, AlertTriangle, RefreshCcw, Cog, Layers, CircleDot, Wind } from "lucide-react";
+import { Plus, ShieldCheck, AlertTriangle, RefreshCcw, Cog, Layers, CircleDot, Wind, FileWarning } from "lucide-react";
 import {
-  Badge, Btn, Fld, Inp, Sl, Textarea, Modal, Srch,
+  Badge, Btn, Fld, Inp, Sl, Textarea, Modal, Srch, Tabs,
   Tbl, TR, TD, NoRow, StatC, AlertBanner, SaveBar, uid,
-  fc, fp, PageModal, SectionLanding, ExcelExportBtn, ExcelImportBtn, PrintBtn,
+  fc, fp, PageModal, SectionLanding, ExcelExportBtn, PrintBtn,
   type LandingCardDef, type ExcelRow,
 } from "./shared";
 import type { QualityWeeklyTask, ProcessDefect, ReworkRecord } from "./types";
+import { PPM_CARDS, BUSH_DRILLDOWN } from "@/lib/fact-plan-data";
 
 const DEF_STATUS: Record<string, { l: string; c: string }> = {
   발생:     { l: "발생",     c: "red" },
@@ -296,8 +298,55 @@ function ReworkPage({ reworks, setReworks }: { reworks: ReworkRecord[]; setRewor
   );
 }
 
+// ── PPM 요약 카드 7개 (코딩계획서 v1.0) ─────────────────────────────────────
+function PpmSummaryCards() {
+  return (
+    <div className="mb-6">
+      <p className="mb-3 font-bold text-[#0a2535]" style={{ fontSize: 14 }}>공정별 PPM 요약</p>
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
+        {PPM_CARDS.map((c) => (
+          <div
+            key={c.category}
+            className={`rounded-xl border p-3 ${
+              c.status === "위험" ? "border-red-300 bg-red-50" : c.status === "주의" ? "border-amber-300 bg-amber-50" : "border-green-200 bg-green-50"
+            }`}
+          >
+            <p className="font-semibold text-[#0a2535]" style={{ fontSize: 11 }}>{c.category}</p>
+            <p className="mt-0.5 font-black" style={{ fontSize: 16 }}>{c.ppm > 0 ? fc(c.ppm) : "—"} PPM</p>
+            <p className="text-slate-600" style={{ fontSize: 9 }}>{Math.round(c.amount / 10000)}만원</p>
+            <Badge l={c.status} c={c.status === "위험" ? "red" : c.status === "주의" ? "amber" : "green"} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── BUSH 드릴다운 테이블 (코딩계획서 v1.0) ───────────────────────────────────
+function BushDrillDownTable() {
+  return (
+    <div className="mb-6">
+      <p className="mb-3 font-bold text-[#0a2535]" style={{ fontSize: 14 }}>BUSH 품번별 PPM 드릴다운</p>
+      <Tbl cols={["품번", "품목명", "검사수↓", "불량수↓", "PPM↓", "불량금액↓", "주요원인", "조치내용"]}>
+        {BUSH_DRILLDOWN.map((r) => (
+          <TR key={r.item_no}>
+            <TD mono bold>{r.item_no}</TD>
+            <TD bold>{r.item_name}</TD>
+            <TD r>{fc(r.inspected)}</TD>
+            <TD r warn>{fc(r.defect)}</TD>
+            <td className={`px-3 py-2 text-right font-bold ${r.ppm > 10000 ? "text-red-500" : r.ppm > 5000 ? "text-amber-500" : ""}`}>{fc(r.ppm)}</td>
+            <TD r>{Math.round(r.amount / 1000)}천</TD>
+            <TD muted cls="max-w-32 truncate">{r.cause}</TD>
+            <TD muted cls="max-w-24 truncate">{r.action}</TD>
+          </TR>
+        ))}
+      </Tbl>
+    </div>
+  );
+}
+
 // ── 메인 컴포넌트 ─────────────────────────────────────────────────────────────
-type QPage = "weekly" | "bush" | "strut" | "vibro" | "seal" | "rubber" | "rework" | null;
+type QPage = "summary" | "weekly" | "bush" | "strut" | "vibro" | "seal" | "rubber" | "rework" | "customer" | null;
 
 const CAT_MAP: Record<string, ProcessDefect["category"]> = {
   bush: "BUSH", strut: "스트럿폼패드", vibro: "스플라이너", seal: "이너씰", rubber: "고무류",
@@ -305,31 +354,45 @@ const CAT_MAP: Record<string, ProcessDefect["category"]> = {
 
 export default function QualitySection() {
   const [openPage, setOpenPage] = useState<QPage>(null);
+  const [tab, setTab] = useState<string>("summary");
   const [tasks, setTasks] = useState<QualityWeeklyTask[]>(INIT_TASKS);
   const [defects, setDefects] = useState<ProcessDefect[]>(INIT_DEFECTS);
   const [reworks, setReworks] = useState<ReworkRecord[]>(INIT_REWORK);
 
   const openDef = defects.filter(d => d.status === "발생" || d.status === "원인조사");
-  const totalDefAmt = defects.reduce((a, d) => a + d.defect_amount, 0);
+
+  const qTabs = [
+    { key: "summary", label: "종합", n: 0 },
+    { key: "weekly", label: "주간 품질", n: tasks.length },
+    { key: "bush", label: "BUSH", n: defects.filter(d => d.category === "BUSH").length },
+    { key: "seal", label: "이너씰", n: defects.filter(d => d.category === "이너씰").length },
+    { key: "vibro", label: "댐퍼/혼플레이트", n: defects.filter(d => d.category === "스플라이너").length },
+    { key: "rubber", label: "순고무", n: defects.filter(d => d.category === "고무류").length },
+    { key: "rework", label: "리워크", n: reworks.length },
+    { key: "customer", label: "고객사 이슈", n: 0 },
+  ];
 
   const cards: LandingCardDef[] = [
-    { key: "weekly", label: "주간 품질 보고", desc: "팀별 주간 품질계획 대비 실적, 고객이슈, 업무진행 현황을 관리합니다.", Icon: ShieldCheck, count: tasks.length, alert: tasks.filter(t => t.status === "미완료").length, color: "#5c6bc0" },
-    { key: "bush",   label: "BUSH 공정불량", desc: "BUSH 제품군(2421750/2421760/2421780) PPM 및 불량 현황을 추적합니다.", Icon: Cog, count: defects.filter(d => d.category === "BUSH").length, alert: defects.filter(d => d.category === "BUSH" && (d.status === "발생" || d.status === "원인조사")).length, color: "#dc2626" },
-    { key: "strut",  label: "스트럿폼패드 불량", desc: "56170-AA000 등 스트럿폼패드 제품군의 공정불량을 관리합니다.", Icon: Layers, count: defects.filter(d => d.category === "스트럿폼패드").length, color: "#d97706" },
-    { key: "vibro",  label: "방진/A·S 불량", desc: "스플라이너(방진A/S) 제품군의 공정불량 및 PPM을 추적합니다.", Icon: Wind, count: defects.filter(d => d.category === "스플라이너").length, color: "#7c3aed" },
-    { key: "seal",   label: "이너씰 불량", desc: "SRG35/45/45L 이너씰 고불량 현황, 원인 분석 및 금형 수정 현황.", Icon: CircleDot, count: defects.filter(d => d.category === "이너씰").length, alert: defects.filter(d => d.category === "이너씰" && d.status === "원인조사").length, color: "#0891b2" },
-    { key: "rubber", label: "고무류 불량", desc: "RB09Z1/RB00GS 등 고무류 제품군의 성형·금형 불량을 관리합니다.", Icon: AlertTriangle, count: defects.filter(d => d.category === "고무류").length, alert: defects.filter(d => d.category === "고무류" && d.status === "발생").length, color: "#059669" },
-    { key: "rework", label: "리워크 현황", desc: "제품군별 월별 리워크 수량·금액을 집계하고 원인을 추적합니다.", Icon: RefreshCcw, count: reworks.length, extra: `총 ${Math.round(reworks.reduce((a,r)=>a+r.total_amount,0)/10000)}만원`, color: "#b45309" },
+    { key: "summary", label: "종합", desc: "PPM 요약 카드 7개, BUSH 드릴다운.", Icon: ShieldCheck, count: 0, color: "#5c6bc0" },
+    { key: "weekly", label: "주간 품질 보고", desc: "팀별 주간 품질계획 대비 실적, 고객이슈.", Icon: ShieldCheck, count: tasks.length, alert: tasks.filter(t => t.status === "미완료").length, color: "#5c6bc0" },
+    { key: "bush", label: "BUSH", desc: "2421750/2421760/2421780 PPM·불량 현황.", Icon: Cog, count: defects.filter(d => d.category === "BUSH").length, alert: defects.filter(d => d.category === "BUSH" && (d.status === "발생" || d.status === "원인조사")).length, color: "#dc2626" },
+    { key: "seal", label: "이너씰", desc: "SRG35/45/45L 이너씰 고불량 현황.", Icon: CircleDot, count: defects.filter(d => d.category === "이너씰").length, alert: defects.filter(d => d.category === "이너씰" && d.status === "원인조사").length, color: "#0891b2" },
+    { key: "vibro", label: "댐퍼/혼플레이트", desc: "방진A/S 등 스플라이너 공정불량.", Icon: Wind, count: defects.filter(d => d.category === "스플라이너").length, color: "#7c3aed" },
+    { key: "rubber", label: "순고무", desc: "RB09Z1/RB00GS 고무류 성형·금형 불량.", Icon: AlertTriangle, count: defects.filter(d => d.category === "고무류").length, alert: defects.filter(d => d.category === "고무류" && d.status === "발생").length, color: "#059669" },
+    { key: "rework", label: "리워크", desc: "제품군별 리워크 수량·금액.", Icon: RefreshCcw, count: reworks.length, extra: `총 ${Math.round(reworks.reduce((a,r)=>a+r.total_amount,0)/10000)}만원`, color: "#b45309" },
+    { key: "customer", label: "고객사 이슈", desc: "고객사별 품질 이슈 추적.", Icon: FileWarning, count: 0, color: "#0d7f8a" },
   ];
 
   const PAGE_TITLE: Record<string, string> = {
+    summary: "종합",
     weekly: "주간 품질 보고",
     bush:   "BUSH 공정불량",
     strut:  "스트럿폼패드 불량",
-    vibro:  "방진/A·S 불량",
+    vibro:  "댐퍼/혼플레이트",
     seal:   "이너씰 불량",
-    rubber: "고무류 불량",
+    rubber: "순고무 불량",
     rework: "리워크 현황",
+    customer: "고객사 이슈",
   };
 
   return (
@@ -352,7 +415,11 @@ export default function QualitySection() {
         let exHeaders: Record<string, string> = {};
         let exFilename = "품질관리";
 
-        if (openPage === "weekly") {
+        if (openPage === "summary" || openPage === "customer") {
+          exData = BUSH_DRILLDOWN as unknown as ExcelRow[];
+          exHeaders = { "품번":"item_no","품목명":"item_name","검사수":"inspected","불량수":"defect","PPM":"ppm","불량금액":"amount","주요원인":"cause","조치내용":"action" };
+          exFilename = openPage === "summary" ? "품질종합" : "고객사이슈";
+        } else if (openPage === "weekly") {
           exData = tasks as unknown as ExcelRow[];
           exHeaders = { "주차":"week","팀":"team","업무유형":"task_type","계획업무":"plan_task","계획담당":"plan_assignee","계획완료일":"plan_due","실적결과":"actual_task","실적담당":"actual_assignee","완료일":"actual_due","고객이슈":"customer_issue","상태":"status" };
           exFilename = "주간품질보고";
@@ -380,9 +447,36 @@ export default function QualitySection() {
             }
           >
             <div id="quality-content">
+              {openPage === "summary" && (
+                <>
+                  <PpmSummaryCards />
+                  <BushDrillDownTable />
+                </>
+              )}
               {openPage === "weekly" && <QualWeeklyPage tasks={tasks} setTasks={setTasks} />}
               {CAT_MAP[openPage] && <DefectPage category={CAT_MAP[openPage]} defects={defects} setDefects={setDefects} />}
               {openPage === "rework" && <ReworkPage reworks={reworks} setReworks={setReworks} />}
+              {openPage === "customer" && (
+                <div className="space-y-4">
+                  <StatC label="진행 이슈" value="3" unit="건" />
+                  <Tbl cols={["고객사", "이슈 내용", "발생일", "상태", "조치"]}>
+                    <TR>
+                      <TD bold>HKMC</TD>
+                      <td className="px-3 py-2">SRG45 치수 불량 — NG 마스터 제작 요청</td>
+                      <TD muted>2026-03-05</TD>
+                      <td className="px-3 py-2"><Badge l="진행중" c="amber" /></td>
+                      <TD muted>체크시트 3/6 완료</TD>
+                    </TR>
+                    <TR>
+                      <TD bold>SECO AIA</TD>
+                      <td className="px-3 py-2">BUSH 2421760 기포불량 — 배합조건 변경</td>
+                      <TD muted>2026-03-03</TD>
+                      <td className="px-3 py-2"><Badge l="조치완료" c="green" /></td>
+                      <TD muted>배합조건 변경 완료</TD>
+                    </TR>
+                  </Tbl>
+                </div>
+              )}
             </div>
           </PageModal>
         );

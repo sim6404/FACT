@@ -1,8 +1,9 @@
 "use client";
-// ─── 구매/자재 섹션 ──────────────────────────────────────────────────────────
+// ─── 구매/자재 섹션 (코딩계획서 v1.0) ────────────────────────────────────────
+// 매입비율 75%/110% 경보 포함
 
 import { useState, useMemo } from "react";
-import { Plus, RefreshCw, ShoppingCart, PackageSearch } from "lucide-react";
+import { Plus, RefreshCw, ShoppingCart, PackageSearch, AlertTriangle } from "lucide-react";
 import {
   Badge, Btn, Fld, Inp, Sl, Modal, Srch,
   Tbl, TR, TD, NoRow, PBar, StatC, AlertBanner, SaveBar, uid,
@@ -10,6 +11,7 @@ import {
   type LandingCardDef, type ExcelRow,
 } from "./shared";
 import type { PurchaseOrder, MaterialSupplyPlan } from "./types";
+import { PURCHASE_RATIO_ALERT } from "@/lib/fact-plan-data";
 
 const PO_S: Record<string, { l: string; c: string }> = {
   발주:     { l: "발주",     c: "blue"  },
@@ -72,6 +74,24 @@ function PoPage({ data, setData }: { data: PurchaseOrder[]; setData: React.Dispa
 
   return (
     <div className="space-y-5">
+      {PURCHASE_RATIO_ALERT.length > 0 && (
+        <div className="rounded-xl border border-amber-300 bg-amber-50 p-4">
+          <p className="mb-2 flex items-center gap-2 font-bold text-amber-800" style={{ fontSize: 12 }}>
+            <AlertTriangle size={14} />
+            매입비율 경보 (75% 미달 / 110% 초과)
+          </p>
+          <div className="space-y-1">
+            {PURCHASE_RATIO_ALERT.map((r, i) => (
+              <div key={i} className="flex items-center justify-between rounded-lg bg-white/80 px-3 py-2">
+                <span className="font-semibold text-slate-700" style={{ fontSize: 11 }}>{r.material}</span>
+                <span className={`font-bold ${r.ratio < 75 ? "text-red-600" : "text-amber-600"}`} style={{ fontSize: 11 }}>
+                  {r.ratio}% — {r.status}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <StatC label="발주·입고대기" value={stats.pending} unit="건" warn={stats.pending > 0} />
         <StatC label="부분입고" value={stats.partial} unit="건" />

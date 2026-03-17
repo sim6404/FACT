@@ -26,11 +26,12 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import {
-  LayoutDashboard, Factory, ClipboardCheck, PackageSearch,
+  LayoutDashboard, Factory, ClipboardCheck,
   ShoppingBag, Truck, FileBarChart2, Bell, Search, Plus,
   RefreshCw, Download, Save, X, Printer, AlertTriangle,
   CheckCircle2, ArrowUpRight, ArrowDownRight, Settings,
   ChevronRight, MoreHorizontal, LogOut, Shield, User,
+  Cpu, FileSignature,
 } from "lucide-react";
 import LoginPage, { type AuthUser } from "./LoginPage";
 import {
@@ -46,12 +47,15 @@ import ProductionSection from "./sections/ProductionSection";
 import QualitySection    from "./sections/QualitySection";
 import SalesSection      from "./sections/SalesSection";
 import PurchaseSection   from "./sections/PurchaseSection";
+import AislvinaSection   from "./sections/AislvinaSection";
 import ReportSection     from "./sections/ReportSection";
+import ApprovalSection   from "./sections/ApprovalSection";
 import FileImportButton, { type ParsedRow } from "./FileImportButton";
+import { DASHBOARD_KPIS, CUSTOMER_SALES } from "@/lib/fact-plan-data";
 
 // ─── types & mock data ────────────────────────────────────────────────────────
 
-type NavKey = "dashboard"|"production"|"quality"|"inventory"|"sales"|"purchase"|"reports";
+type NavKey = "dashboard"|"production"|"quality"|"sales"|"purchase"|"aislvina"|"reports"|"approvals";
 
 interface SalesOrder { id:string;order_no:string;customer:string;product_name:string;order_qty:number;shipped_qty:number;order_date:string;due_date:string;status:string;amount:number;is_delayed:boolean; }
 interface PurchReq    { id:string;pr_no:string;material_name:string;qty:number;unit:string;required_date:string;status:string;requester:string;reason:string;vendor?:string; }
@@ -388,14 +392,15 @@ function KRow({label,value,change,up,good,trend}:{label:string;value:string;chan
   );
 }
 
-// ─── 대시보드 모듈 퀵 액세스 카드 데이터 ─────────────────────────────────────
+// ─── 대시보드 모듈 퀵 액세스 카드 데이터 (코딩계획서 v1.0) ─────────────────────
 const DB_MODULES: {key:NavKey;label:string;sub:string;Icon:React.ElementType;color:string;accent:string;kpi:string;kpiLabel:string}[] = [
-  {key:"production",label:"생산 관리",sub:"작업지시·공정현황",Icon:Factory,      color:"#0d7f8a",accent:"rgba(13,127,138,0.1)",  kpi:"87%",   kpiLabel:"달성률"},
-  {key:"quality",   label:"품질 관리",sub:"NCR·불량 분석",   Icon:ClipboardCheck,color:"#e53935",accent:"rgba(229,57,53,0.1)",   kpi:"1.8%",  kpiLabel:"불량률"},
-  {key:"inventory", label:"재고 관리",sub:"입출고·안전재고",  Icon:PackageSearch, color:"#0a5f6e",accent:"rgba(10,95,110,0.1)",   kpi:"2건",   kpiLabel:"미달"},
-  {key:"sales",     label:"수주·영업",sub:"수주·납기 추적",  Icon:ShoppingBag,   color:"#f57c00",accent:"rgba(245,124,0,0.1)",   kpi:"426만", kpiLabel:"이달 수주"},
-  {key:"purchase",  label:"구매·자재",sub:"발주·자재 조달",  Icon:Truck,         color:"#6a1b9a",accent:"rgba(106,27,154,0.1)",  kpi:"4건",   kpiLabel:"진행 중"},
-  {key:"reports",   label:"보고서",   sub:"KPI·경영 분석",   Icon:FileBarChart2, color:"#0277bd",accent:"rgba(2,119,189,0.1)",   kpi:"월간",  kpiLabel:"리포트"},
+  {key:"production",label:"생산관리",sub:"주차별실적·인력·도포실",Icon:Factory,      color:"#0d7f8a",accent:"rgba(13,127,138,0.1)",  kpi:"99.3%", kpiLabel:"달성률"},
+  {key:"quality",   label:"품질관리",sub:"종합·BUSH·이너씰·리워크",Icon:ClipboardCheck,color:"#e53935",accent:"rgba(229,57,53,0.1)",   kpi:"16,281",kpiLabel:"PPM"},
+  {key:"sales",     label:"영업관리",sub:"매출·고객사별·계획vs실적",Icon:ShoppingBag,   color:"#f57c00",accent:"rgba(245,124,0,0.1)",   kpi:"96.5%",kpiLabel:"매출달성"},
+  {key:"purchase",  label:"구매/자재",sub:"발주·매입비율 경보",     Icon:Truck,         color:"#6a1b9a",accent:"rgba(106,27,154,0.1)",  kpi:"75/110",kpiLabel:"비율"},
+  {key:"aislvina",  label:"AISLVINA",sub:"설비가동률·비가동원인",  Icon:Cpu,           color:"#0891b2",accent:"rgba(8,145,178,0.1)",   kpi:"설비", kpiLabel:"가동률"},
+  {key:"reports",   label:"보고서",  sub:"PDF·PPT·결재",          Icon:FileBarChart2, color:"#0277bd",accent:"rgba(2,119,189,0.1)",   kpi:"월간", kpiLabel:"리포트"},
+  {key:"approvals", label:"승인",    sub:"4M·주간회의 결재",       Icon:FileSignature, color:"#059669",accent:"rgba(5,150,105,0.1)",   kpi:"결재", kpiLabel:"대기"},
 ];
 
 // ── 애니메이션 스파크라인 (sparkline with draw animation) ──────────────────
@@ -626,36 +631,38 @@ function Dashboard({inqs,ncrs,ledg,nav}:{inqs:ProductionInquiry[];ncrs:QualityNC
     ...delayed.map(s=>`납기 지연: ${s.order_no}`),
   ];
 
-  // ── KPI 타일 정의 ────────────────────────────────────────────────────────
+  // ── KPI 타일 7개 (코딩계획서 v1.0) ────────────────────────────────────────
+  const k = DASHBOARD_KPIS;
   const KPI_TILES: KpiCardProps[] = [
-    {
-      label:"생산 달성률", value: live.prod.toFixed(1), unit:"%",
-      change: flash.prod > 0 ? `+${(live.prod - (liveHistory.prod[liveHistory.prod.length-2]??live.prod)).toFixed(1)}%` : "+6.1%",
-      up:true, good:true, color:"#0d7f8a", darkColor:"#0a5f6e",
-      bg:"linear-gradient(135deg, #0e9dab 0%, #0d7f8a 50%, #0a6070 100%)",
-      trend: liveHistory.prod.slice(-8), live:true, flash:flash.prod, animDelay:0,
-    },
-    {
-      label:"품질 불량률", value: live.defect.toFixed(2), unit:"%",
-      change: flash.defect > 0 ? "▼ 개선" : "−21.7%",
-      up:false, good:true, color:"#e53935", darkColor:"#b71c1c",
-      bg:"linear-gradient(135deg, #ef5350 0%, #e53935 50%, #c62828 100%)",
-      trend: liveHistory.defect.slice(-8), live:true, flash:flash.defect, animDelay:80,
-    },
-    {
-      label:"미결 NCR", value:`${live.ncr}`, unit:"건",
-      change: live.ncr<=2 ? "정상범위" : "조치필요",
-      up: live.ncr<3, good:true, color:"#f57c00", darkColor:"#bf360c",
-      bg:"linear-gradient(135deg, #ff9800 0%, #f57c00 50%, #e65100 100%)",
-      trend:[4,3,3,2,2,3,2,live.ncr], live:false, flash:flash.ncr, animDelay:160,
-    },
-    {
-      label:"납기 달성률", value: live.due.toFixed(1), unit:"%",
-      change: flash.due > 0 ? `+${(live.due - (liveHistory.due[liveHistory.due.length-2]??live.due)).toFixed(1)}%` : "+3.4%",
-      up:true, good:true, color:"#1565c0", darkColor:"#0d47a1",
-      bg:"linear-gradient(135deg, #1976d2 0%, #1565c0 50%, #0d47a1 100%)",
-      trend: liveHistory.due.slice(-8), live:true, flash:flash.due, animDelay:240,
-    },
+    { label:"이번달 매출", value:(k.sales_amount/1000).toFixed(0), unit:"천원",
+      change:"영업", up:true, good:true, color:"#f59e0b", darkColor:"#b45309",
+      bg:"linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)",
+      trend:SALES_TR, live:false, flash:0, animDelay:0 },
+    { label:"매출 달성률", value:k.sales_rate.toFixed(1), unit:"%",
+      change: k.sales_rate>=95 ? "목표달성" : "미달",
+      up:k.sales_rate>=95, good:true, color: k.sales_rate>=95 ? "#22c55e" : "#ef4444", darkColor:"#15803d",
+      bg: k.sales_rate>=95 ? "linear-gradient(135deg, #4ade80 0%, #22c55e 50%, #16a34a 100%)" : "linear-gradient(135deg, #f87171 0%, #ef4444 50%, #dc2626 100%)",
+      trend:SALES_TR, live:false, flash:0, animDelay:80 },
+    { label:"평균 PPM", value:k.avg_ppm.toLocaleString(), unit:"PPM",
+      change:"품질", up:false, good:true, color:"#7c3aed", darkColor:"#5b21b6",
+      bg:"linear-gradient(135deg, #a78bfa 0%, #7c3aed 50%, #6d28d9 100%)",
+      trend: [18,17,16,16,17,16,16,16], live:false, flash:0, animDelay:160 },
+    { label:"불량금액", value:(k.defect_amount/10000).toFixed(0), unit:"만원",
+      change:"품질", up:false, good:true, color:"#ef4444", darkColor:"#b91c1c",
+      bg:"linear-gradient(135deg, #f87171 0%, #ef4444 50%, #dc2626 100%)",
+      trend: [12,11,10,10,11,10,10,10], live:false, flash:0, animDelay:200 },
+    { label:"생산 달성률", value:k.production_rate.toFixed(1), unit:"%",
+      change:"생산", up:true, good:true, color:"#22c55e", darkColor:"#15803d",
+      bg:"linear-gradient(135deg, #4ade80 0%, #22c55e 50%, #16a34a 100%)",
+      trend: liveHistory.prod.slice(-8), live:true, flash:flash.prod, animDelay:240 },
+    { label:"인력 가동률", value:`${k.labor_count.current}/${k.labor_count.total}`, unit:"명",
+      change:"생산", up:true, good:true, color:"#3b82f6", darkColor:"#1d4ed8",
+      bg:"linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%)",
+      trend:[45,46,48,49,50,50,k.labor_count.current], live:false, flash:0, animDelay:280 },
+    { label:"설비 가동률", value: k.equipment_rate!=null ? `${k.equipment_rate.toFixed(1)}%` : "—", unit:"",
+      change:"AISLVINA", up:true, good:true, color:"#06b6d4", darkColor:"#0891b2",
+      bg:"linear-gradient(135deg, #22d3ee 0%, #06b6d4 50%, #0891b2 100%)",
+      trend:[90,91,92,93,93,94], live:false, flash:0, animDelay:320 },
   ];
 
   return (
@@ -684,9 +691,30 @@ function Dashboard({inqs,ncrs,ledg,nav}:{inqs:ProductionInquiry[];ncrs:QualityNC
         </div>
       )}
 
-      {/* ── KPI 타일 4개 (애니메이션) ───────────────────────────────────── */}
-      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
-        {KPI_TILES.map((t,i) => <KpiCard key={t.label} {...t} animDelay={i*80}/>)}
+      {/* ── KPI 타일 7개 (코딩계획서 v1.0) ───────────────────────────────── */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
+        {KPI_TILES.map((t,i) => <KpiCard key={t.label} {...t} animDelay={i*60}/>)}
+      </div>
+
+      {/* ── 고객사별 매출 현황 (코딩계획서 v1.0) ───────────────────────────── */}
+      <div>
+        <div className="mb-3 flex items-center justify-between">
+          <p className="font-black text-[#0d1117]" style={{fontSize:16,letterSpacing:"-0.02em"}}>고객사별 매출 현황</p>
+          <button onClick={()=>nav("sales")} className="text-[11px] font-semibold text-[#5c6bc0] hover:underline">영업관리 →</button>
+        </div>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          {CUSTOMER_SALES.map((c)=>(
+            <div key={c.customer} className="rounded-2xl border border-[#e4e8ee] bg-white p-4 shadow-sm transition hover:shadow-md">
+              <p className="font-bold text-[#0d1117]" style={{fontSize:13}}>{c.customer}</p>
+              <div className="mt-2 flex items-baseline gap-1">
+                <span className="font-black text-[#0d7f8a]" style={{fontSize:22}}>{c.rate.toFixed(1)}%</span>
+                <span className="text-slate-500" style={{fontSize:10}}>달성</span>
+              </div>
+              <p className="mt-1 text-slate-500" style={{fontSize:10}}>목표 {(c.target/1000).toFixed(0)}천 / 실적 {(c.actual/1000).toFixed(0)}천</p>
+              {c.cause&&<p className="mt-1 truncate text-amber-600" style={{fontSize:9}}>원인: {c.cause}</p>}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* ── 모듈 퀵 액세스 카드 ─────────────────────────────────────────── */}
@@ -762,11 +790,11 @@ function Dashboard({inqs,ncrs,ledg,nav}:{inqs:ProductionInquiry[];ncrs:QualityNC
             <p style={{fontSize:11,color:"#9aa3b2",marginTop:2}}>전월 대비 변화율</p>
           </div>
           <div className="divide-y" style={{borderColor:"#f5f6f8"}}>
-            <KRow label="생산 달성률" value={`${live.prod.toFixed(1)}%`} change="+6.1%" up    good={false} trend={liveHistory.prod.slice(-6)}/>
-            <KRow label="품질 불량률" value={`${live.defect.toFixed(2)}%`} change="−21.7%" up={false} good={true} trend={liveHistory.defect.slice(-6)}/>
-            <KRow label="납기 달성률" value={`${live.due.toFixed(1)}%`} change="+3.4%" up    good={false} trend={liveHistory.due}/>
-            <KRow label="미결 NCR"    value={`${live.ncr}건`} change="−33%" up={live.ncr<3} good={true} trend={[4,3,3,2,2,3,2,live.ncr]}/>
-            <KRow label="이달 수주"   value={fa(totalS)} change="+11.8%" up    good={false} trend={SALES_TR}/>
+            <KRow label="매출 달성률" value={`${DASHBOARD_KPIS.sales_rate}%`} change="영업" up good={DASHBOARD_KPIS.sales_rate>=95} trend={SALES_TR}/>
+            <KRow label="생산 달성률" value={`${DASHBOARD_KPIS.production_rate}%`} change="생산" up good={true} trend={liveHistory.prod.slice(-6)}/>
+            <KRow label="평균 PPM" value={DASHBOARD_KPIS.avg_ppm.toLocaleString()} change="품질" up={false} good={true} trend={[18,17,16,16,17,16]}/>
+            <KRow label="미결 NCR" value={`${live.ncr}건`} change={live.ncr<=2?"정상":"조치필요"} up={live.ncr<3} good={true} trend={[4,3,3,2,2,3,2,live.ncr]}/>
+            <KRow label="이번달 매출" value={`${(DASHBOARD_KPIS.sales_amount/1000).toFixed(0)}천`} change="영업" up good={false} trend={SALES_TR}/>
           </div>
         </div>
       </div>
@@ -1311,12 +1339,13 @@ function ReportSec({inqs,ncrs,ledg}:{inqs:ProductionInquiry[];ncrs:QualityNCR[];
 
 const NAV:[NavKey,string,React.ElementType][] = [
   ["dashboard","대시보드",LayoutDashboard],
-  ["production","생산 관리",Factory],
-  ["quality","품질 관리",ClipboardCheck],
-  ["inventory","재고 관리",PackageSearch],
-  ["sales","수주·영업",ShoppingBag],
-  ["purchase","구매·자재",Truck],
+  ["production","생산관리",Factory],
+  ["quality","품질관리",ClipboardCheck],
+  ["sales","영업관리",ShoppingBag],
+  ["purchase","구매/자재",Truck],
+  ["aislvina","AISLVINA",Cpu],
   ["reports","보고서",FileBarChart2],
+  ["approvals","승인",FileSignature],
 ];
 
 export default function AppShell() {
@@ -1369,10 +1398,11 @@ export default function AppShell() {
       case"dashboard": return<Dashboard inqs={inqs} ncrs={ncrs} ledg={ledg} nav={setNav}/>;
       case"production":return<ProductionSection/>;
       case"quality":   return<QualitySection/>;
-      case"inventory": return<InvSec/>;
       case"sales":     return<SalesSection/>;
       case"purchase":  return<PurchaseSection/>;
+      case"aislvina":  return<AislvinaSection/>;
       case"reports":   return<ReportSection/>;
+      case"approvals": return<ApprovalSection/>;
     }
   };
 

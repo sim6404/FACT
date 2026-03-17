@@ -440,13 +440,42 @@ function WeeklyPage({ weekly }: { weekly: WeeklySummary[] }) {
   );
 }
 
-// ── 메인 컴포넌트 ─────────────────────────────────────────────────────────────
+// ── 도포실 페이지 (코딩계획서 v1.0: 사내/외주 금액 비교) ────────────────────────
+const COATING_DATA = [
+  { month: "2026-01", inhouse: 42000000, outsourced: 38500000, diff: 3500000 },
+  { month: "2026-02", inhouse: 45800000, outsourced: 41200000, diff: 4600000 },
+];
+
+function CoatingPage() {
+  return (
+    <div className="space-y-5">
+      <div className="grid grid-cols-3 gap-4">
+        <StatC label="사내 합계" value={`${Math.round(COATING_DATA.reduce((a,d)=>a+d.inhouse,0)/10000)}만`} unit="원" />
+        <StatC label="외주 합계" value={`${Math.round(COATING_DATA.reduce((a,d)=>a+d.outsourced,0)/10000)}만`} unit="원" />
+        <StatC label="사내-외주 차이" value={`+${Math.round(COATING_DATA.reduce((a,d)=>a+d.diff,0)/10000)}만`} unit="원" />
+      </div>
+      <Tbl cols={["월", "사내 금액↓", "외주 금액↓", "차이↓"]}>
+        {COATING_DATA.map((d) => (
+          <TR key={d.month}>
+            <TD bold>{d.month}</TD>
+            <TD r>{fc(d.inhouse)}</TD>
+            <TD r>{fc(d.outsourced)}</TD>
+            <td className="px-3 py-2 text-right font-bold text-emerald-600">+{fc(d.diff)}</td>
+          </TR>
+        ))}
+      </Tbl>
+      <p className="text-slate-500" style={{ fontSize: 11 }}>※ 사내 도포 금액이 외주 대비 높을 경우 외주 전환 검토 가능</p>
+    </div>
+  );
+}
+
+// ── 메인 컴포넌트 (코딩계획서 v1.0: 4탭) ─────────────────────────────────────
 export interface ProductionSectionProps {
   onDataChange?: (data: { wos: WorkOrder[]; daily: DailyProductionRecord[]; weekly: WeeklySummary[] }) => void;
 }
 
 export default function ProductionSection({ onDataChange: _onDataChange }: ProductionSectionProps) {
-  const [openPage, setOpenPage] = useState<"wo" | "daily" | "worker" | "weekly" | null>(null);
+  const [openPage, setOpenPage] = useState<"wo" | "daily" | "worker" | "weekly" | "coating" | null>(null);
   const [wos, setWos] = useState<WorkOrder[]>(INIT_WO);
   const [daily, setDaily] = useState<DailyProductionRecord[]>(INIT_DAILY);
   const [workers, setWorkers] = useState<WorkerAssignment[]>(INIT_WORKER);
@@ -456,48 +485,19 @@ export default function ProductionSection({ onDataChange: _onDataChange }: Produ
   const workerShortage = workers.reduce((a, w) => a + (w.standard_workers - w.assigned_workers), 0);
 
   const cards: LandingCardDef[] = [
-    {
-      key: "wo",
-      label: "작업지시 현황",
-      desc: "생산 계획 대비 실적을 라인별, 품목별로 관리합니다. 지연/보류 현황을 추적합니다.",
-      Icon: ClipboardList,
-      count: wos.length,
-      alert: delayed,
-      color: "#5c6bc0",
-    },
-    {
-      key: "daily",
-      label: "생산 일보",
-      desc: "일별 시프트(주간/야간)별 생산 실적을 입력하고 불량률을 모니터링합니다.",
-      Icon: BarChart2,
-      count: daily.length,
-      color: "#0891b2",
-    },
-    {
-      key: "worker",
-      label: "작업인원 배치",
-      desc: "라인별 표준 인원과 실배치 인원을 관리하고 인원 부족 현황을 파악합니다.",
-      Icon: Users,
-      count: workers.length,
-      alert: workerShortage > 0 ? workerShortage : undefined,
-      color: "#7c3aed",
-    },
-    {
-      key: "weekly",
-      label: "주간 생산 집계",
-      desc: "주차별 생산/불량/리워크 수량을 집계하고 달성률을 분석합니다.",
-      Icon: TrendingUp,
-      count: weekly.length,
-      extra: `최근: ${weekly[weekly.length - 1]?.week_range ?? "—"}`,
-      color: "#059669",
-    },
+    { key: "weekly", label: "주차별 실적", desc: "공정별 주·야간 계획·실적·달성률, 불량·리워크 집계.", Icon: TrendingUp, count: weekly.length, extra: weekly[weekly.length - 1]?.week_range ?? "—", color: "#059669" },
+    { key: "worker", label: "인력 운영", desc: "라인별 표준/실배치 인원, 특이사항 관리.", Icon: Users, count: workers.length, alert: workerShortage > 0 ? workerShortage : undefined, color: "#7c3aed" },
+    { key: "daily", label: "투입시간", desc: "일별 시프트별 생산 실적, 불량률 모니터링.", Icon: BarChart2, count: daily.length, color: "#0891b2" },
+    { key: "coating", label: "도포실", desc: "사내/외주 도포 금액 비교.", Icon: ClipboardList, count: COATING_DATA.length, color: "#5c6bc0" },
+    { key: "wo", label: "작업지시", desc: "생산 계획 대비 실적, 지연 현황.", Icon: ClipboardList, count: wos.length, alert: delayed, color: "#0d7f8a" },
   ];
 
   const pageTitle: Record<string, string> = {
+    weekly: "주차별 실적",
+    worker: "인력 운영",
+    daily: "투입시간",
+    coating: "도포실",
     wo: "작업지시 현황",
-    daily: "생산 일보",
-    worker: "작업인원 배치",
-    weekly: "주간 생산 집계",
   };
 
   const getExcelData = (): { data: ExcelRow[]; headers: Record<string, string>; filename: string } => {
@@ -520,7 +520,12 @@ export default function ProductionSection({ onDataChange: _onDataChange }: Produ
       case "weekly": return {
         data: weekly as unknown as ExcelRow[],
         headers: { "연도": "year", "주차": "week_no", "기간": "week_range", "라인": "line", "품목코드": "item_code", "품목명": "item_name", "계획": "plan_qty", "실적": "actual_qty", "불량": "ng_qty", "리워크": "rework_qty", "달성률": "achievement_rate" },
-        filename: "주간생산집계",
+        filename: "주차별실적",
+      };
+      case "coating": return {
+        data: COATING_DATA as unknown as ExcelRow[],
+        headers: { "월": "month", "사내금액": "inhouse", "외주금액": "outsourced", "차이": "diff" },
+        filename: "도포실_사내외주비교",
       };
       default: return { data: [], headers: {}, filename: "export" };
     }
@@ -553,8 +558,8 @@ export default function ProductionSection({ onDataChange: _onDataChange }: Produ
   return (
     <div>
       <SectionLanding
-        title="생산 / 입고 / 조립 관리"
-        sub="작업지시 · 생산일보 · 작업인원 배치 · 주간 집계"
+        title="생산관리 (코딩계획서 v1.0)"
+        sub="주차별 실적 · 인력 운영 · 투입시간 · 도포실"
         cards={cards}
         onOpen={k => setOpenPage(k as typeof openPage)}
       />
@@ -577,10 +582,11 @@ export default function ProductionSection({ onDataChange: _onDataChange }: Produ
           }
         >
           <div id={`prod-content-${openPage}`}>
-            {openPage === "wo"     && <WoPage wos={wos} setWos={setWos} />}
+            {openPage === "wo"      && <WoPage wos={wos} setWos={setWos} />}
             {openPage === "daily"  && <DailyPage wos={wos} daily={daily} setDaily={setDaily} />}
             {openPage === "worker" && <WorkerPage workers={workers} setWorkers={setWorkers} />}
             {openPage === "weekly" && <WeeklyPage weekly={weekly} />}
+            {openPage === "coating" && <CoatingPage />}
           </div>
         </PageModal>
       )}

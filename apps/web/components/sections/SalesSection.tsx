@@ -1,5 +1,6 @@
 "use client";
-// ─── 영업/수주 섹션 ──────────────────────────────────────────────────────────
+// ─── 영업/수주 섹션 (코딩계획서 v1.0) ──────────────────────────────────────────
+// 고객사별 4카드: 평화산업, SECO AIA, 삼익 THK, 자동차
 
 import { useState, useMemo } from "react";
 import { Plus, Printer, TrendingUp, BarChart2, Users2, ArrowUpRight, ArrowDownRight } from "lucide-react";
@@ -10,6 +11,7 @@ import {
   type LandingCardDef, type ExcelRow,
 } from "./shared";
 import type { MonthlySalesCategory, HkmcProgress, CustomerTarget } from "./types";
+import { CUSTOMER_SALES } from "@/lib/fact-plan-data";
 
 const CUST_S: Record<string, { l: string; c: string }> = {
   달성: { l: "달성", c: "green" },
@@ -448,6 +450,27 @@ export default function SalesSection() {
 
   return (
     <div>
+      <div className="mb-6">
+        <p className="mb-3 font-bold text-[#0a2535]" style={{ fontSize: 14 }}>고객사별 매출 현황 (2026-02)</p>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          {CUSTOMER_SALES.map((c) => (
+            <div
+              key={c.customer}
+              className="rounded-2xl border border-[#e8eaf0] bg-white p-4 shadow-sm transition hover:shadow-md cursor-pointer"
+              onClick={() => setOpenPage("customer")}
+            >
+              <p className="font-bold text-[#0d1117]" style={{ fontSize: 13 }}>{c.customer}</p>
+              <div className="mt-2 flex items-baseline gap-1">
+                <span className={`font-black ${c.rate >= 95 ? "text-emerald-600" : c.rate >= 90 ? "text-amber-600" : "text-red-500"}`} style={{ fontSize: 22 }}>{c.rate.toFixed(1)}%</span>
+                <span className="text-slate-500" style={{ fontSize: 10 }}>달성</span>
+              </div>
+              <p className="mt-1 text-slate-500" style={{ fontSize: 10 }}>목표 {(c.target/1000).toFixed(0)}천 / 실적 {(c.actual/1000).toFixed(0)}천</p>
+              {c.cause && <p className="mt-1 truncate text-amber-600" style={{ fontSize: 9 }}>원인: {c.cause}</p>}
+              {c.action && <p className="mt-0.5 truncate text-slate-500" style={{ fontSize: 9 }}>대책: {c.action}</p>}
+            </div>
+          ))}
+        </div>
+      </div>
       <SectionLanding
         title="영업 개발 / 수주 관리"
         sub="월별 매출현황 · HKMC OEM 진도 · 고객사별 목표 실적"
