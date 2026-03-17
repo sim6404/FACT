@@ -15,6 +15,7 @@ import {
 import type {
   WorkOrder, DailyProductionRecord, WorkerAssignment, WeeklySummary,
 } from "./types";
+import { COATING_ROOM, LABOR_STATUS, INPUT_HOURS, RESPONSIBLES } from "@/lib/fact-plan-data";
 
 const WO_S: Record<string, { l: string; c: string }> = {
   대기:   { l: "대기",   c: "gray" },
@@ -240,7 +241,7 @@ function WoPage({ wos, setWos }: { wos: WorkOrder[]; setWos: React.Dispatch<Reac
   );
 }
 
-// ── 생산 일보 페이지 콘텐츠 ───────────────────────────────────────────────────
+// ── 생산 일보·투입시간 페이지 (PPT Slide 5: 2월 4주차 투입시간) ───────────────
 function DailyPage({ wos, daily, setDaily }: {
   wos: WorkOrder[]; daily: DailyProductionRecord[];
   setDaily: React.Dispatch<React.SetStateAction<DailyProductionRecord[]>>;
@@ -255,6 +256,17 @@ function DailyPage({ wos, daily, setDaily }: {
 
   return (
     <div className="space-y-5">
+      <div className="rounded-xl border border-sky-200 bg-sky-50 p-4">
+        <p className="mb-2 font-bold text-sky-800" style={{ fontSize: 12 }}>□ 2월 4주차 투입시간 관리 (PPT 기준)</p>
+        <div className="flex flex-wrap gap-4">
+          <StatC label="주간 계획" value={INPUT_HOURS.dayShift.plan} unit="h" />
+          <StatC label="주간 실적" value={INPUT_HOURS.dayShift.actual} unit="h" />
+          <StatC label="주간 달성률" value={INPUT_HOURS.dayShift.rate} unit="%" />
+          <StatC label="야간 계획" value={INPUT_HOURS.nightShift.plan} unit="h" />
+          <StatC label="야간 실적" value={INPUT_HOURS.nightShift.actual} unit="h" />
+          <StatC label="야간 달성률" value={INPUT_HOURS.nightShift.rate} unit="%" />
+        </div>
+      </div>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <StatC label="입력 건수" value={daily.length} unit="건" />
         <StatC label="계획 합계" value={fc(daily.reduce((a,d)=>a+d.plan_qty,0))} unit="EA" />
@@ -301,7 +313,7 @@ function DailyPage({ wos, daily, setDaily }: {
   );
 }
 
-// ── 작업인원 배치 페이지 콘텐츠 ───────────────────────────────────────────────
+// ── 작업인원 배치 페이지 콘텐츠 (PPT Slide 5: 인력 운영 현황) ─────────────────
 function WorkerPage({ workers, setWorkers }: {
   workers: WorkerAssignment[];
   setWorkers: React.Dispatch<React.SetStateAction<WorkerAssignment[]>>;
@@ -315,6 +327,15 @@ function WorkerPage({ workers, setWorkers }: {
 
   return (
     <div className="space-y-5">
+      <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-4">
+        <p className="mb-2 font-bold text-indigo-800" style={{ fontSize: 12 }}>□ 인력 운영 현황 (PPT 02월 04주차)</p>
+        <div className="flex flex-wrap items-center gap-4">
+          <StatC label="계획인원" value={LABOR_STATUS.plan} unit="명" />
+          <StatC label="투입인원" value={LABOR_STATUS.actual} unit="명" />
+          <StatC label="담당자" value={RESPONSIBLES.productionManager} unit="" />
+          <p className="text-indigo-700" style={{ fontSize: 10 }}>생산 {RESPONSIBLES.productionLeader}, 검사 {RESPONSIBLES.qualityLeader}</p>
+        </div>
+      </div>
       <div className="grid grid-cols-3 gap-4">
         <StatC label="표준 총인원" value={stats.total} unit="명" />
         <StatC label="실배치 인원" value={stats.assigned} unit="명" />
@@ -440,31 +461,25 @@ function WeeklyPage({ weekly }: { weekly: WeeklySummary[] }) {
   );
 }
 
-// ── 도포실 페이지 (코딩계획서 v1.0: 사내/외주 금액 비교) ────────────────────────
-const COATING_DATA = [
-  { month: "2026-01", inhouse: 42000000, outsourced: 38500000, diff: 3500000 },
-  { month: "2026-02", inhouse: 45800000, outsourced: 41200000, diff: 4600000 },
-];
-
+// ── 도포실 페이지 (PPT Slide 11: 3월 도포실 예상계획) ─────────────────────────
 function CoatingPage() {
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-3 gap-4">
-        <StatC label="사내 합계" value={`${Math.round(COATING_DATA.reduce((a,d)=>a+d.inhouse,0)/10000)}만`} unit="원" />
-        <StatC label="외주 합계" value={`${Math.round(COATING_DATA.reduce((a,d)=>a+d.outsourced,0)/10000)}만`} unit="원" />
-        <StatC label="사내-외주 차이" value={`+${Math.round(COATING_DATA.reduce((a,d)=>a+d.diff,0)/10000)}만`} unit="원" />
+      <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+        <p className="mb-2 font-bold text-amber-800" style={{ fontSize: 12 }}>□ 3월 도포실 예상계획</p>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <StatC label="3월 필요원 (주간)" value={COATING_ROOM.marchNeed.day} unit="명" />
+          <StatC label="3월 필요원 (야간)" value={COATING_ROOM.marchNeed.night} unit="명" />
+          <StatC label="사내 도포금액" value={`${Math.round(COATING_ROOM.inhouse/10000)}만`} unit="원" />
+          <StatC label="대영 도포금액" value={`${Math.round(COATING_ROOM.daeyoung/10000)}만`} unit="원" />
+        </div>
+        <p className="mt-2 text-amber-700" style={{ fontSize: 10 }}>(대영 전처리비 {fc(COATING_ROOM.daeyoungPreprocess)}원)</p>
       </div>
-      <Tbl cols={["월", "사내 금액↓", "외주 금액↓", "차이↓"]}>
-        {COATING_DATA.map((d) => (
-          <TR key={d.month}>
-            <TD bold>{d.month}</TD>
-            <TD r>{fc(d.inhouse)}</TD>
-            <TD r>{fc(d.outsourced)}</TD>
-            <td className="px-3 py-2 text-right font-bold text-emerald-600">+{fc(d.diff)}</td>
-          </TR>
-        ))}
+      <Tbl cols={["구분", "금액(원)", "비고"]}>
+        <TR><TD bold>사내 도포</TD><TD r>{fc(COATING_ROOM.inhouse)}</TD><TD muted>3월 연동</TD></TR>
+        <TR><TD bold>대영 도포</TD><TD r>{fc(COATING_ROOM.daeyoung)}</TD><TD muted>전처리비 {fc(COATING_ROOM.daeyoungPreprocess)} 포함</TD></TR>
       </Tbl>
-      <p className="text-slate-500" style={{ fontSize: 11 }}>※ 사내 도포 금액이 외주 대비 높을 경우 외주 전환 검토 가능</p>
+      <p className="text-slate-500" style={{ fontSize: 11 }}>※ PPT 주간회의 26년 02월 04주차 기준</p>
     </div>
   );
 }
@@ -488,7 +503,7 @@ export default function ProductionSection({ onDataChange: _onDataChange }: Produ
     { key: "weekly", label: "주차별 실적", desc: "공정별 주·야간 계획·실적·달성률, 불량·리워크 집계.", Icon: TrendingUp, count: weekly.length, extra: weekly[weekly.length - 1]?.week_range ?? "—", color: "#059669" },
     { key: "worker", label: "인력 운영", desc: "라인별 표준/실배치 인원, 특이사항 관리.", Icon: Users, count: workers.length, alert: workerShortage > 0 ? workerShortage : undefined, color: "#7c3aed" },
     { key: "daily", label: "투입시간", desc: "일별 시프트별 생산 실적, 불량률 모니터링.", Icon: BarChart2, count: daily.length, color: "#0891b2" },
-    { key: "coating", label: "도포실", desc: "사내/외주 도포 금액 비교.", Icon: ClipboardList, count: COATING_DATA.length, color: "#5c6bc0" },
+    { key: "coating", label: "도포실", desc: "사내/대영 도포 금액 비교 (PPT 02월 04주차).", Icon: ClipboardList, count: 1, color: "#5c6bc0" },
     { key: "wo", label: "작업지시", desc: "생산 계획 대비 실적, 지연 현황.", Icon: ClipboardList, count: wos.length, alert: delayed, color: "#0d7f8a" },
   ];
 
@@ -523,9 +538,9 @@ export default function ProductionSection({ onDataChange: _onDataChange }: Produ
         filename: "주차별실적",
       };
       case "coating": return {
-        data: COATING_DATA as unknown as ExcelRow[],
-        headers: { "월": "month", "사내금액": "inhouse", "외주금액": "outsourced", "차이": "diff" },
-        filename: "도포실_사내외주비교",
+        data: [{ inhouse: COATING_ROOM.inhouse, daeyoung: COATING_ROOM.daeyoung }] as unknown as ExcelRow[],
+        headers: { "사내금액": "inhouse", "대영금액": "daeyoung" },
+        filename: "도포실_사내대영비교",
       };
       default: return { data: [], headers: {}, filename: "export" };
     }

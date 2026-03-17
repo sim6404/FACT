@@ -710,8 +710,8 @@ function Dashboard({inqs,ncrs,ledg,nav}:{inqs:ProductionInquiry[];ncrs:QualityNC
                 <span className="font-black text-[#0d7f8a]" style={{fontSize:22}}>{c.rate.toFixed(1)}%</span>
                 <span className="text-slate-500" style={{fontSize:10}}>달성</span>
               </div>
-              <p className="mt-1 text-slate-500" style={{fontSize:10}}>목표 {(c.target/1000).toFixed(0)}천 / 실적 {(c.actual/1000).toFixed(0)}천</p>
-              {c.cause&&<p className="mt-1 truncate text-amber-600" style={{fontSize:9}}>원인: {c.cause}</p>}
+              <p className="mt-1 text-slate-500" style={{fontSize:10}}>목표 {c.target.toLocaleString()}천 / 실적 {c.actual.toLocaleString()}천 {typeof c.gap==="number"&&`(${c.gap>=0?"+":""}${c.gap.toLocaleString()})`}</p>
+              {c.notes&&<p className="mt-1 truncate text-amber-600" style={{fontSize:9}}>{c.notes}</p>}
             </div>
           ))}
         </div>

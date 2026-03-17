@@ -1,15 +1,16 @@
 "use client";
-// ─── 승인 섹션 (코딩계획서 v1.0) ───────────────────────────────────────────
+// ─── 승인 섹션 (PPT Slide 2 결재양식: 작성→검토→승인) ─────────────────────────
 // 주간회의 결재선, 4M 변경 승인
 
 import { useState } from "react";
-import { FileSignature, CheckCircle2, Clock, User } from "lucide-react";
+import { FileSignature } from "lucide-react";
 import { PgHdr, Btn, Tbl, TR, TD, Badge } from "./shared";
+import { MEETING_INFO } from "@/lib/fact-plan-data";
 
 const MOCK_APPROVALS = [
-  { id: "a1", type: "주간회의 결재", title: "제조 운영 주간 보고서 2026-W09", requester: "경영지원팀", created: "2026-02-12", status: "검토중", step: 2, steps: ["작성", "검토", "승인"] },
-  { id: "a2", type: "4M 변경 승인", title: "이너씰 금형 교체 — SRG45", requester: "기술팀", created: "2026-02-11", status: "대기", step: 1, steps: ["검토 요청", "승인"] },
-  { id: "a3", type: "주간회의 결재", title: "품질 이상 패턴 리포트 2026-02", requester: "품질팀", created: "2026-02-10", status: "승인완료", step: 3, steps: ["작성", "검토", "승인"] },
+  { id: "a1", type: "주간회의 결재", title: "02월(04주차) 주간 회의 — 지시사항 및 주요사항", requester: "경영지원팀", created: MEETING_INFO.date, status: "검토중" as const, step: 2, steps: ["작성", "검토", "승인"] as const },
+  { id: "a2", type: "4M 변경 승인", title: "이너씰 금형 교체 — SRG45", requester: "기술팀", created: "2026-02-11", status: "대기" as const, step: 1, steps: ["검토 요청", "승인"] as const },
+  { id: "a3", type: "주간회의 결재", title: "26년 01월 사업 계획 대비 실적보고", requester: "경영지원팀", created: "2026-02-27", status: "승인완료" as const, step: 3, steps: ["작성", "검토", "승인"] as const },
 ];
 
 const STEP_COLORS: Record<string, string> = {

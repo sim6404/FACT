@@ -11,7 +11,7 @@ import {
   type LandingCardDef, type ExcelRow,
 } from "./shared";
 import type { QualityWeeklyTask, ProcessDefect, ReworkRecord } from "./types";
-import { PPM_CARDS, BUSH_DRILLDOWN } from "@/lib/fact-plan-data";
+import { PPM_CARDS, BUSH_DRILLDOWN, DASHBOARD_KPIS } from "@/lib/fact-plan-data";
 
 const DEF_STATUS: Record<string, { l: string; c: string }> = {
   발생:     { l: "발생",     c: "red" },
@@ -298,10 +298,17 @@ function ReworkPage({ reworks, setReworks }: { reworks: ReworkRecord[]; setRewor
   );
 }
 
-// ── PPM 요약 카드 7개 (코딩계획서 v1.0) ─────────────────────────────────────
+// ── PPM 요약 카드 7개 (PPT Slide 17: 품질 합계) ─────────────────────────────
 function PpmSummaryCards() {
   return (
     <div className="mb-6">
+      <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
+        <p className="mb-2 font-bold text-amber-800" style={{ fontSize: 12 }}>□ 2월 품질 합계 (PPT 02월 04주차)</p>
+        <div className="flex flex-wrap gap-4">
+          <StatC label="평균 PPM" value={DASHBOARD_KPIS.avg_ppm.toLocaleString()} unit="PPM" />
+          <StatC label="불량금액" value={`${Math.round(DASHBOARD_KPIS.defect_amount/10000).toLocaleString()}만`} unit="원" warn />
+        </div>
+      </div>
       <p className="mb-3 font-bold text-[#0a2535]" style={{ fontSize: 14 }}>공정별 PPM 요약</p>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
         {PPM_CARDS.map((c) => (
@@ -327,11 +334,10 @@ function BushDrillDownTable() {
   return (
     <div className="mb-6">
       <p className="mb-3 font-bold text-[#0a2535]" style={{ fontSize: 14 }}>BUSH 품번별 PPM 드릴다운</p>
-      <Tbl cols={["품번", "품목명", "검사수↓", "불량수↓", "PPM↓", "불량금액↓", "주요원인", "조치내용"]}>
+      <Tbl cols={["품번", "검사수↓", "불량수↓", "PPM↓", "불량금액↓", "주요원인", "조치내용"]}>
         {BUSH_DRILLDOWN.map((r) => (
           <TR key={r.item_no}>
             <TD mono bold>{r.item_no}</TD>
-            <TD bold>{r.item_name}</TD>
             <TD r>{fc(r.inspected)}</TD>
             <TD r warn>{fc(r.defect)}</TD>
             <td className={`px-3 py-2 text-right font-bold ${r.ppm > 10000 ? "text-red-500" : r.ppm > 5000 ? "text-amber-500" : ""}`}>{fc(r.ppm)}</td>

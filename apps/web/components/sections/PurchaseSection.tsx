@@ -82,8 +82,9 @@ function PoPage({ data, setData }: { data: PurchaseOrder[]; setData: React.Dispa
           </p>
           <div className="space-y-1">
             {PURCHASE_RATIO_ALERT.map((r, i) => (
-              <div key={i} className="flex items-center justify-between rounded-lg bg-white/80 px-3 py-2">
+              <div key={i} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-white/80 px-3 py-2">
                 <span className="font-semibold text-slate-700" style={{ fontSize: 11 }}>{r.material}</span>
+                <span className="text-slate-500" style={{ fontSize: 10 }}>계획 {fc(r.planned)} / 실매입 {fc(r.actual)}</span>
                 <span className={`font-bold ${r.ratio < 75 ? "text-red-600" : "text-amber-600"}`} style={{ fontSize: 11 }}>
                   {r.ratio}% — {r.status}
                 </span>

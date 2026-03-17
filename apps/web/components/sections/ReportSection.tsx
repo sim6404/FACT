@@ -1,10 +1,11 @@
 "use client";
-// ─── 주간 보고서 자동 집계 ────────────────────────────────────────────────────
+// ─── 주간 보고서 자동 집계 (PPT 주간회의 26년 02월 04주차 양식) ───────────────────
 // 모든 섹션 데이터를 연동하여 영동테크 주간회의 보고서 서식으로 자동 출력
 
 import { useMemo, useRef, useCallback } from "react";
 import { Download, Printer, FileBarChart2, FileDown } from "lucide-react";
 import { Btn, PgHdr, Tbl, TR, TD, NoRow, Badge, PBar, StatC, fc, fw, fp, fd } from "./shared";
+import { MEETING_INFO } from "@/lib/fact-plan-data";
 
 // ── 인쇄 / PDF 유틸리티 ────────────────────────────────────────────────────────
 function triggerPrint(title: string) {
@@ -127,9 +128,9 @@ function ReportHdr({ no, week, range, writer }: { no: string; week: string; rang
           >YD</div>
           <div>
             <p className="font-bold uppercase tracking-[0.2em]" style={{ fontSize: 9, color: "#0d7f8a" }}>영동테크 주식회사</p>
-            <h2 className="mt-1.5 font-black tracking-tight text-white" style={{ fontSize: 22 }}>주간 업무 보고</h2>
+            <h2 className="mt-1.5 font-black tracking-tight text-white" style={{ fontSize: 22 }}>02월(04주차) 주간 회의</h2>
             <p className="mt-1" style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>
-              보고기간: {range} &nbsp;|&nbsp; {week}
+              {MEETING_INFO.title} &nbsp;|&nbsp; 2026년 {MEETING_INFO.yearPlan}억 매출계획({MEETING_INFO.monthPlan}억/02월) &nbsp;|&nbsp; 업무기간 {MEETING_INFO.workPeriod}
             </p>
           </div>
         </div>
@@ -166,10 +167,10 @@ export default function ReportSection({ data: extData }: ReportSectionProps) {
     ...extData,
   }), [extData]);
 
-  const weekNo = 10;
+  const weekNo = 4;
   const year   = 2026;
-  const range  = "2026.03.03 ~ 2026.03.07";
-  const reportTitle = `영동테크_주간업무보고_${year}-${weekNo}주차`;
+  const range  = MEETING_INFO.workPeriod;
+  const reportTitle = `주간회의_26년_02월_04주차`;
 
   // 집계
   const prodRate   = fp(d.prodActualTotal, d.prodPlanTotal);

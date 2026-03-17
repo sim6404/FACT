@@ -11,7 +11,7 @@ import {
   type LandingCardDef, type ExcelRow,
 } from "./shared";
 import type { MonthlySalesCategory, HkmcProgress, CustomerTarget } from "./types";
-import { CUSTOMER_SALES } from "@/lib/fact-plan-data";
+import { CUSTOMER_SALES, SALES_TOTAL } from "@/lib/fact-plan-data";
 
 const CUST_S: Record<string, { l: string; c: string }> = {
   달성: { l: "달성", c: "green" },
@@ -41,12 +41,14 @@ const INIT_HKMC: HkmcProgress[] = [
   { id:"h4", year:2026, month:3, item_code:"SRG45",        item_name:"이너씰 SRG45",           customer:"HKMC", monthly_plan:28000, w1_plan:6000, w2_plan:6000, w3_plan:7000, w4_plan:9000, w5_plan:0, w1_actual:4795, w2_actual:0, w3_actual:0, w4_actual:0, w5_actual:0, mtd_actual:4795,  achievement_rate:17, status:"지연", remarks:"SRG45L 고불량 영향" },
 ];
 
-const INIT_CUSTOMER: CustomerTarget[] = [
-  { id:"ct1", year:2026, month:3, customer:"영동",     division:"BUSH/스트럿",    target_amount:335000000, actual_amount:300090000, gap:-34910000, achievement_rate:90, status:"미달",  action_items:["차기 발주 확보 요청","니코 바이그로멧 재고 부족 → 긴급 조달","SR 번호 드라이 및 30HX 이너씰 백오더 확인"] },
-  { id:"ct2", year:2026, month:3, customer:"익THK",    division:"이너씰/베어링",  target_amount:150000000, actual_amount:223530000, gap:73530000,  achievement_rate:149,status:"초과",  action_items:["AV 진행 추급 및 예정 확인","삼성테크노(수) 공장 특정 번호 집중 발주 SR15/30X"] },
-  { id:"ct3", year:2026, month:3, customer:"화성업",   division:"방진/스플라이너",target_amount:613150000, actual_amount:568060000, gap:-45090000, achievement_rate:93, status:"미달",  action_items:["HKMC OEM 실적 저조로 인한 발주 감소","PHA 출고(070/073) 5,000만원 수주 요청","코모스 생산 공장 3월 조립 계획 접수"] },
-  { id:"ct4", year:2026, month:3, customer:"SECO AIA", division:"방진AS/BUSH",   target_amount:731450000, actual_amount:659960000, gap:-71490000, achievement_rate:90, status:"미달",  action_items:["내수 납품 완료 → KD 출고 진행 완료(2/27)","STR 스트 퍼 수발주 → 일조립 계획 감소","평화산업 CN7 BUSH 및 SECO 이너씰 혼레트"] },
-];
+// PPT 2/28 월 마감 기준 (천원→원 변환) - 주간회의 26년 02월 04주차
+const INIT_CUSTOMER: CustomerTarget[] = CUSTOMER_SALES.map((c, i) => ({
+  id: `ct${i+1}`, year: 2026, month: 2, customer: c.customer, division: "",
+  target_amount: c.target * 1000, actual_amount: c.actual * 1000,
+  gap: c.gap * 1000, achievement_rate: Math.round(c.rate * 10) / 10,
+  status: c.gap >= 0 ? "초과" : "미달" as const,
+  action_items: c.notes ? [c.notes] : [],
+}));
 
 // ── 월별 매출 현황 페이지 ─────────────────────────────────────────────────────
 function MonthlySalesPage({ data, setData }: { data: MonthlySalesCategory[]; setData: React.Dispatch<React.SetStateAction<MonthlySalesCategory[]>> }) {
@@ -451,7 +453,7 @@ export default function SalesSection() {
   return (
     <div>
       <div className="mb-6">
-        <p className="mb-3 font-bold text-[#0a2535]" style={{ fontSize: 14 }}>고객사별 매출 현황 (2026-02)</p>
+        <p className="mb-3 font-bold text-[#0a2535]" style={{ fontSize: 14 }}>전체 매출 현황 – 2/28 월 마감 기준 (천원)</p>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           {CUSTOMER_SALES.map((c) => (
             <div
@@ -464,12 +466,12 @@ export default function SalesSection() {
                 <span className={`font-black ${c.rate >= 95 ? "text-emerald-600" : c.rate >= 90 ? "text-amber-600" : "text-red-500"}`} style={{ fontSize: 22 }}>{c.rate.toFixed(1)}%</span>
                 <span className="text-slate-500" style={{ fontSize: 10 }}>달성</span>
               </div>
-              <p className="mt-1 text-slate-500" style={{ fontSize: 10 }}>목표 {(c.target/1000).toFixed(0)}천 / 실적 {(c.actual/1000).toFixed(0)}천</p>
-              {c.cause && <p className="mt-1 truncate text-amber-600" style={{ fontSize: 9 }}>원인: {c.cause}</p>}
-              {c.action && <p className="mt-0.5 truncate text-slate-500" style={{ fontSize: 9 }}>대책: {c.action}</p>}
+              <p className="mt-1 text-slate-500" style={{ fontSize: 10 }}>목표 {c.target.toLocaleString()} / 실적 {c.actual.toLocaleString()} ({c.gap >= 0 ? "+" : ""}{c.gap.toLocaleString()})</p>
+              {c.notes && <p className="mt-1 truncate text-amber-600" style={{ fontSize: 9 }}>{c.notes}</p>}
             </div>
           ))}
         </div>
+        <p className="mt-2 text-slate-500" style={{ fontSize: 11 }}>TOTAL: 목표 {SALES_TOTAL.target.toLocaleString()}천 / 실적 {SALES_TOTAL.actual.toLocaleString()}천 / 차이 {SALES_TOTAL.gap.toLocaleString()}천 (PPT 주간회의 26년 02월 04주차)</p>
       </div>
       <SectionLanding
         title="영업 개발 / 수주 관리"
