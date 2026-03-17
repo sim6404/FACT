@@ -9,6 +9,6 @@
     "dev:web": "npm --workspace apps/web run dev",
     "build:web": "npm --workspace apps/web run build",
     "start:web": "npm --workspace apps/web run start",
-    "deploy": "npm run build:web && git add apps/ package.json && (git diff --cached --quiet || git commit -m \"chore: deploy\") && git push origin main"
+    "deploy": "npm run build:web && git add apps/ package.json .github/ DEPLOY.md && (git diff --cached --quiet || git commit -m \"chore: deploy\") && git push origin main && cd apps/web && vercel deploy --prod --yes"
   }
 }

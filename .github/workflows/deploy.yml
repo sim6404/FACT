@@ -1,0 +1,25 @@
+# Vercel 자동 배포 - main 브랜치 푸시 시 배포
+# 필수: GitHub Settings → Secrets에 VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID 추가
+# VERCEL_TOKEN: vercel.com/account/tokens 에서 발급
+# VERCEL_ORG_ID: team_4ufF9HXLd35AocWwgnAGWJvL
+# VERCEL_PROJECT_ID: prj_FP1qCqBjKV3DoCAhhmB5fBBvUewe
+name: Deploy to Vercel
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./apps/web
+          vercel-args: "--prod"

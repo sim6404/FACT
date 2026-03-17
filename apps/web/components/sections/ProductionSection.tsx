@@ -573,7 +573,7 @@ export default function ProductionSection({ onDataChange: _onDataChange }: Produ
   return (
     <div>
       <SectionLanding
-        title="생산관리 (코딩계획서 v1.0)"
+        title="생산관리"
         sub="주차별 실적 · 인력 운영 · 투입시간 · 도포실"
         cards={cards}
         onOpen={k => setOpenPage(k as typeof openPage)}
