@@ -203,10 +203,10 @@ function Badge({l,c}:{l:string;c:string}) {
 /** Modal overlay */
 function Modal({title,onClose,children,wide=false}:{title:string;onClose:()=>void;children:React.ReactNode;wide?:boolean}) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1e2247]/50 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
       <div className={`flex flex-col w-full rounded-2xl bg-white shadow-2xl ${wide?"max-w-2xl":"max-w-lg"}`}>
         <div className="flex shrink-0 items-center justify-between border-b border-slate-100 px-5 py-3.5">
-          <span className="text-[13px] font-semibold text-[#1e2247]">{title}</span>
+          <span className="text-[13px] font-semibold text-slate-800">{title}</span>
           <button onClick={onClose} className="flex h-6 w-6 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 transition-colors"><X size={13}/></button>
         </div>
         <div className="overflow-y-auto px-5 py-4" style={{maxHeight:"80vh"}}>{children}</div>
@@ -225,13 +225,13 @@ function Fld({label,req,children}:{label:string;req?:boolean;children:React.Reac
 }
 
 function Inp(p:React.InputHTMLAttributes<HTMLInputElement>) {
-  return <input {...p} className="h-8 w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 text-[11px] text-[#1e2247] outline-none transition placeholder:text-slate-400 focus:border-[#5c6bc0] focus:bg-white focus:ring-2 focus:ring-[#5c6bc0]/15"/>;
+  return <input {...p} className="h-9 w-full rounded-lg border border-slate-200 bg-white px-2.5 text-[13px] text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary-soft)]"/>;
 }
 
 function Sl({v,set,opts}:{v:string;set:(x:string)=>void;opts:{value:string;label:string}[]}) {
   return (
     <select value={v} onChange={e=>set(e.target.value)}
-      className="h-8 w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 text-[11px] text-[#1e2247] outline-none transition focus:border-[#5c6bc0] focus:bg-white">
+      className="h-9 w-full rounded-lg border border-slate-200 bg-white px-2.5 text-[13px] text-slate-800 outline-none transition focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary-soft)]">
       {opts.map(o=><option key={o.value} value={o.value}>{o.label}</option>)}
     </select>
   );
@@ -239,15 +239,15 @@ function Sl({v,set,opts}:{v:string;set:(x:string)=>void;opts:{value:string;label
 
 function Btn({onClick,v="primary",disabled,children,icon,xs}:{onClick?:()=>void;v?:"primary"|"secondary"|"ghost"|"danger";disabled?:boolean;children:React.ReactNode;icon?:React.ReactNode;xs?:boolean}) {
   const cls={
-    primary:"bg-[#5c6bc0] text-white hover:bg-[#4a5ab5] shadow-sm",
-    secondary:"bg-white text-[#1e2247] border border-slate-200 hover:bg-slate-50 shadow-sm",
-    ghost:"text-slate-500 hover:bg-slate-100",
+    primary:"bg-[var(--primary)] text-white hover:bg-[var(--primary-hover)] shadow-sm",
+    secondary:"bg-white text-slate-800 border border-slate-200 hover:bg-slate-50 shadow-sm",
+    ghost:"text-slate-600 hover:bg-slate-100",
     danger:"bg-red-500 text-white hover:bg-red-600 shadow-sm",
   }[v];
   return (
     <button onClick={onClick} disabled={disabled}
-      className={`inline-flex items-center gap-1.5 rounded-lg font-medium transition-all disabled:opacity-50 ${cls} ${xs?"h-6 px-2":"h-7 px-2.5"}`}
-      style={{fontSize:xs?9:11}}>
+      className={`inline-flex items-center gap-1.5 rounded-lg font-medium transition-all disabled:opacity-50 ${cls} ${xs?"h-6 px-2":"h-9 px-2.5"}`}
+      style={{fontSize:xs?9:13}}>
       {icon}{children}
     </button>
   );
@@ -258,7 +258,7 @@ function PgHdr({title,sub,actions}:{title:string;sub?:string;actions?:React.Reac
   return (
     <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
       <div>
-        <h1 className="font-semibold text-[#1e2247]" style={{fontSize:15}}>{title}</h1>
+        <h1 className="font-semibold text-slate-800" style={{fontSize:15}}>{title}</h1>
         {sub&&<p className="mt-0.5 text-slate-400" style={{fontSize:10}}>{sub}</p>}
       </div>
       {actions&&<div className="flex items-center gap-1.5">{actions}</div>}
@@ -269,19 +269,19 @@ function PgHdr({title,sub,actions}:{title:string;sub?:string;actions?:React.Reac
 /** Data table */
 function Tbl({cols,children}:{cols:string[];children:React.ReactNode}) {
   return (
-    <div className="overflow-hidden rounded-xl border border-[#e8eaf0] bg-white shadow-sm">
+    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-[#eef1f8] bg-[#f7f8fc]">
+            <tr className="border-b border-slate-200 bg-slate-50/90">
               {cols.map(c=>(
-                <th key={c} className={`whitespace-nowrap px-3 py-2 text-left font-semibold uppercase tracking-widest text-slate-400 ${c.includes("↓")?"text-right":""}`} style={{fontSize:9}}>
+                <th key={c} className={`whitespace-nowrap px-4 py-3.5 text-left font-semibold uppercase tracking-wider text-slate-500 ${c.includes("↓")?"text-right":""}`} style={{fontSize:12}}>
                   {c.replace("↓","")}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#f3f4f9]">{children}</tbody>
+          <tbody className="divide-y divide-slate-200">{children}</tbody>
         </table>
       </div>
     </div>
@@ -289,11 +289,11 @@ function Tbl({cols,children}:{cols:string[];children:React.ReactNode}) {
 }
 
 function TR({children,onClick}:{children:React.ReactNode;onClick?:()=>void}) {
-  return <tr onClick={onClick} className={`transition-colors text-[11px] ${onClick?"cursor-pointer hover:bg-indigo-50/30":"hover:bg-[#f7f8fc]/60"}`}>{children}</tr>;
+  return <tr onClick={onClick} className={`transition-colors text-[13px] ${onClick?"cursor-pointer hover:bg-slate-50/80":"hover:bg-slate-50/60"}`}>{children}</tr>;
 }
 function TD({children,r,muted,mono,bold,warn,cls=""}:{children:React.ReactNode;r?:boolean;muted?:boolean;mono?:boolean;bold?:boolean;warn?:boolean;cls?:string}) {
   return (
-    <td className={`px-3 py-2 ${r?"text-right":""} ${muted?"text-slate-400":""} ${mono?"font-mono text-[10px]":""} ${bold?"font-semibold text-[#1e2247]":""} ${warn?"font-bold text-red-500":""} ${cls}`}>
+    <td className={`px-4 py-2.5 ${r?"text-right":""} ${muted?"text-slate-500":""} ${mono?"font-mono text-[10px]":""} ${bold?"font-semibold text-slate-800":""} ${warn?"font-bold text-red-500":""} ${cls}`}>
       {children}
     </td>
   );
@@ -306,10 +306,10 @@ function Tabs({tabs,active,set}:{tabs:{key:string;label:string;n?:number}[];acti
       {tabs.map(t=>(
         <button key={t.key} onClick={()=>set(t.key)}
           className={`flex h-6 items-center gap-1 rounded-full px-2.5 font-medium transition-all ${
-            active===t.key?"bg-[#5c6bc0] text-white shadow-sm":"bg-white text-slate-500 border border-[#e8eaf0] hover:text-[#1e2247]"
+            active===t.key?"bg-[var(--primary)] text-white shadow-sm":"bg-white text-slate-600 border border-slate-200 hover:text-slate-800"
           }`} style={{fontSize:10}}>
           {t.label}
-          {t.n!==undefined&&<span className={`rounded-full px-1 ${active===t.key?"text-indigo-200":"text-slate-400"}`} style={{fontSize:9}}>{t.n}</span>}
+          {t.n!==undefined&&<span className={`rounded-full px-1 ${active===t.key?"text-white/80":"text-slate-500"}`} style={{fontSize:9}}>{t.n}</span>}
         </button>
       ))}
     </div>
@@ -318,9 +318,9 @@ function Tabs({tabs,active,set}:{tabs:{key:string;label:string;n?:number}[];acti
 
 function Srch({v,set,ph}:{v:string;set:(s:string)=>void;ph:string}) {
   return (
-    <div className="mb-3 flex h-8 items-center gap-2 rounded-lg border border-[#e8eaf0] bg-white px-3 shadow-sm transition focus-within:border-[#5c6bc0] focus-within:ring-2 focus-within:ring-[#5c6bc0]/15">
-      <Search size={12} className="shrink-0 text-slate-400"/>
-      <input className="flex-1 bg-transparent text-[11px] text-[#1e2247] outline-none placeholder:text-slate-400"
+    <div className="mb-3 flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 shadow-sm transition focus-within:border-[var(--primary)] focus-within:ring-2 focus-within:ring-[var(--primary-soft)]">
+      <Search size={13} className="shrink-0 text-slate-400"/>
+      <input className="flex-1 bg-transparent text-[13px] text-slate-800 outline-none placeholder:text-slate-400"
         placeholder={ph} value={v} onChange={e=>set(e.target.value)}/>
     </div>
   );
@@ -328,7 +328,7 @@ function Srch({v,set,ph}:{v:string;set:(s:string)=>void;ph:string}) {
 
 function PBar({a,b,c="indigo"}:{a:number;b:number;c?:string}) {
   const r=pct(a,b);
-  const fill={indigo:"bg-[#5c6bc0]",green:"bg-emerald-500",amber:"bg-amber-400",red:"bg-red-400"}[c]??"bg-[#5c6bc0]";
+  const fill={indigo:"bg-[var(--primary)]",green:"bg-emerald-500",amber:"bg-amber-400",red:"bg-red-400"}[c]??"bg-[var(--primary)]";
   return (
     <div className="flex items-center gap-2">
       <div className="h-1 w-14 overflow-hidden rounded-full bg-[#eef1f8]">
@@ -346,9 +346,9 @@ function NoRow({n,msg="데이터가 없습니다"}:{n:number;msg?:string}) {
 /** Module stat card (top of each section) — 중앙 정렬 */
 function StatC({label,value,unit,warn}:{label:string;value:string|number;unit?:string;warn?:boolean}) {
   return (
-    <div className="rounded-xl border border-[#e0e6ea] bg-white p-3.5 text-center shadow-sm">
-      <p className="text-slate-400" style={{fontSize:9}}>{label}</p>
-      <p className={`mt-1.5 font-bold leading-none tabular-nums ${warn?"text-amber-500":"text-[#0a2535]"}`} style={{fontSize:26}}>
+    <div className="rounded-xl border border-slate-200 bg-white p-3.5 text-center shadow-sm">
+      <p className="text-slate-500" style={{fontSize:12}}>{label}</p>
+      <p className={`mt-1.5 font-bold leading-none tabular-nums ${warn?"text-amber-500":"text-slate-800"}`} style={{fontSize:22}}>
         {value}<span className="ml-0.5 font-normal text-slate-300" style={{fontSize:11}}>{unit}</span>
       </p>
     </div>
@@ -362,9 +362,9 @@ function StatC({label,value,unit,warn}:{label:string;value:string|number;unit?:s
 /** CRM-style summary card (Sale / Payments / Activities) */
 function SumCard({title,period,children,action}:{title:string;period?:string;children:React.ReactNode;action?:()=>void}) {
   return (
-    <div className="flex flex-col rounded-xl border border-[#e8eaf0] bg-white p-4 shadow-sm">
+    <div className="flex flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
       <div className="mb-3 flex items-center justify-between">
-        <span className="font-bold text-[#1e2247]" style={{fontSize:12}}>{title}</span>
+        <span className="font-semibold text-slate-800" style={{fontSize:13}}>{title}</span>
         <div className="flex items-center gap-2">
           {period&&<span className="text-slate-400" style={{fontSize:9}}>{period}</span>}
           <button onClick={action} className="text-slate-300 hover:text-slate-500"><MoreHorizontal size={13}/></button>
@@ -379,10 +379,10 @@ function SumCard({title,period,children,action}:{title:string;period?:string;chi
 function KRow({label,value,change,up,good,trend}:{label:string;value:string;change:string;up:boolean;good:boolean;trend:number[]}) {
   const pos=good?!up:up;
   return (
-    <div className="flex items-center gap-2 px-4 py-2.5 hover:bg-[#f7f8fc]/60 transition-colors">
+    <div className="flex items-center gap-2 px-4 py-2.5 hover:bg-slate-50/60 transition-colors">
       <div className="flex-1 min-w-0">
-        <p className="text-slate-400" style={{fontSize:9}}>{label}</p>
-        <p className="mt-0.5 font-bold tabular-nums text-[#1e2247]" style={{fontSize:16}}>{value}</p>
+        <p className="text-slate-500" style={{fontSize:12}}>{label}</p>
+        <p className="mt-0.5 font-bold tabular-nums text-slate-800" style={{fontSize:15}}>{value}</p>
       </div>
       <Spark data={trend} up={pos}/>
       <span className={`flex items-center gap-0.5 font-semibold w-14 justify-end ${pos?"text-emerald-500":"text-red-400"}`} style={{fontSize:10}}>
@@ -394,7 +394,7 @@ function KRow({label,value,change,up,good,trend}:{label:string;value:string;chan
 
 // ─── 대시보드 모듈 퀵 액세스 카드 데이터 (코딩계획서 v1.0) ─────────────────────
 const DB_MODULES: {key:NavKey;label:string;sub:string;Icon:React.ElementType;color:string;accent:string;kpi:string;kpiLabel:string}[] = [
-  {key:"production",label:"생산관리",sub:"주차별실적·인력·도포실",Icon:Factory,      color:"#0d7f8a",accent:"rgba(13,127,138,0.1)",  kpi:"99.3%", kpiLabel:"달성률"},
+  {key:"production",label:"생산관리",sub:"주차별실적·인력·도포실",Icon:Factory,      color:"var(--primary)",accent:"var(--primary-soft)",  kpi:"99.3%", kpiLabel:"달성률"},
   {key:"quality",   label:"품질관리",sub:"종합·BUSH·이너씰·리워크",Icon:ClipboardCheck,color:"#e53935",accent:"rgba(229,57,53,0.1)",   kpi:"16,281",kpiLabel:"PPM"},
   {key:"sales",     label:"영업관리",sub:"매출·고객사별·계획vs실적",Icon:ShoppingBag,   color:"#f57c00",accent:"rgba(245,124,0,0.1)",   kpi:"96.5%",kpiLabel:"매출달성"},
   {key:"purchase",  label:"구매/자재",sub:"발주·매입비율 경보",     Icon:Truck,         color:"#6a1b9a",accent:"rgba(106,27,154,0.1)",  kpi:"75/110",kpiLabel:"비율"},
@@ -1407,10 +1407,10 @@ export default function AppShell() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{background:"#edf1f3"}}>
+    <div className="flex h-screen overflow-hidden" style={{background:"var(--bg)"}}>
 
         {/* ══ SIDEBAR ════════════════════════════════════════════════ */}
-      <aside className="flex w-[210px] shrink-0 flex-col" style={{background:"linear-gradient(180deg,#0a1628 0%,#0e1f38 100%)"}}>
+      <aside className="flex w-[220px] shrink-0 flex-col" style={{background:"linear-gradient(180deg, var(--sidebar) 0%, #1e293b 100%)", borderRight:"1px solid rgba(255,255,255,0.06)"}}>
 
         {/* ── 로고 영역 */}
         <div
@@ -1444,9 +1444,9 @@ export default function AppShell() {
               <button key={key} onClick={()=>setNav(key)}
                 className="group flex w-full items-center gap-2.5 rounded-xl px-3 py-3 transition-all"
                 style={{
-                  background:active?"rgba(13,127,138,0.92)":"transparent",
-                  color:active?"#ffffff":"rgba(255,255,255,0.45)",
-                  boxShadow:active?"0 2px 12px rgba(13,127,138,0.35)":"none",
+                  background:active?"var(--primary)":"transparent",
+                  color:active?"#ffffff":"rgba(255,255,255,0.5)",
+                  boxShadow:active?"0 2px 12px rgba(10,107,124,0.35)":"none",
                 }}>
                 <Icon size={active?18:16} style={{color:active?"#ffffff":"rgba(255,255,255,0.32)"}}/>
                 <span className="flex-1 text-left font-semibold" style={{fontSize:active?18:15}}>{label}</span>
@@ -1462,7 +1462,7 @@ export default function AppShell() {
         {/* 사용자 + 로그아웃 */}
         <div className="p-3">
           <div className="flex items-center gap-2.5 rounded-xl px-2.5 py-2.5" style={{background:"rgba(255,255,255,0.05)"}}>
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-black text-white" style={{background:isAdmin?"#0d7f8a":"#059669",fontSize:12}}>
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-bold text-white" style={{background:isAdmin?"var(--primary)":"var(--success)",fontSize:12}}>
               {authUser.initial}
             </div>
             <div className="min-w-0 flex-1">
@@ -1485,7 +1485,7 @@ export default function AppShell() {
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
 
         {/* topbar */}
-        <header className="flex h-[66px] shrink-0 items-center justify-between border-b bg-white px-5" style={{borderColor:"#e4e8ee"}}>
+        <header className="flex h-[66px] shrink-0 items-center justify-between border-b border-slate-200 bg-white px-5 shadow-sm">
           {/* 왼쪽: 섹션 아이콘 + 이름 */}
           <div className="flex items-center gap-2.5">
             {cur&&(()=>{const Icon=cur[2];return(
@@ -1493,7 +1493,7 @@ export default function AppShell() {
                 className="flex shrink-0 items-center justify-center"
                 style={{
                   width:28,height:28,borderRadius:8,
-                  background:"linear-gradient(135deg,#0d7f8a 0%,#0a6470 100%)",
+                  background:"linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%)",
                   boxShadow:"0 2px 8px rgba(13,127,138,0.35)",
                 }}
               >
@@ -1501,7 +1501,7 @@ export default function AppShell() {
               </div>
             );})()}
             <div className="flex items-baseline gap-2">
-              <p className="font-black" style={{fontSize:24,color:"#0d1117",letterSpacing:"-0.02em"}}>{cur?.[1]}</p>
+              <p className="font-bold" style={{fontSize:22,color:"var(--txt1)",letterSpacing:"-0.02em"}}>{cur?.[1]}</p>
               <span className="hidden sm:inline" style={{fontSize:10,color:"#c0c8d4"}}>|</span>
               <p className="hidden sm:block" style={{fontSize:10,color:"#b0b8c4"}}>
                 {new Date().toLocaleDateString("ko-KR",{year:"numeric",month:"long",day:"numeric",weekday:"short"})}
@@ -1512,7 +1512,7 @@ export default function AppShell() {
           {/* 오른쪽 */}
           <div className="flex items-center gap-2">
             {/* 검색 */}
-            <div className="hidden items-center gap-2 rounded-xl border bg-[#f8f9fb] px-3 py-2 sm:flex" style={{borderColor:"#e4e8ee"}}>
+            <div className="hidden items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-2 sm:flex">
               <Search size={13} style={{color:"#9aa3b2"}}/>
               <span style={{fontSize:11,color:"#9aa3b2",width:110}}>메뉴 · 품목 검색…</span>
             </div>
@@ -1528,14 +1528,14 @@ export default function AppShell() {
               {notif&&alerts.length>0&&(
                 <div className="absolute right-0 top-10 z-50 w-72 overflow-hidden rounded-2xl border bg-white shadow-2xl" style={{borderColor:"#e4e8ee"}}>
                   <div className="flex items-center justify-between border-b px-4 py-3" style={{borderColor:"#f0f3f6"}}>
-                    <p className="font-bold" style={{fontSize:13,color:"#0d1117"}}>조치 필요 {alerts.length}건</p>
+                    <p className="font-bold" style={{fontSize:13,color:"var(--txt1)"}}>조치 필요 {alerts.length}건</p>
                     <button onClick={()=>setNotif(false)} className="transition-colors hover:text-red-400" style={{color:"#9aa3b2"}}><X size={13}/></button>
                   </div>
                   <div className="max-h-52 divide-y overflow-y-auto" style={{borderColor:"#f5f6f8"}}>
                     {alerts.map((t,i)=>(
                       <div key={i} className="flex items-start gap-3 px-4 py-2.5">
                         <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-red-400"/>
-                        <p style={{fontSize:12,color:"#0d1117"}}>{t}</p>
+                        <p style={{fontSize:12,color:"var(--txt1)"}}>{t}</p>
                       </div>
                     ))}
                   </div>
@@ -1546,10 +1546,10 @@ export default function AppShell() {
             <div className="h-5 w-px" style={{background:"#e4e8ee"}}/>
 
             {/* 사용자 */}
-            <div className="flex h-8 items-center gap-2 rounded-xl border bg-[#f8f9fb] px-2.5" style={{borderColor:"#e4e8ee"}}>
-              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-black text-white" style={{background:isAdmin?"#0d7f8a":"#059669",fontSize:10}}>{authUser.initial}</div>
+            <div className="flex h-8 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/80 px-2.5">
+              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-bold text-white" style={{background:isAdmin?"var(--primary)":"var(--success)",fontSize:10}}>{authUser.initial}</div>
               <div className="hidden sm:block">
-                <p className="font-bold" style={{fontSize:12,lineHeight:1.2,color:"#0d1117"}}>{authUser.name}</p>
+                <p className="font-bold" style={{fontSize:12,lineHeight:1.2,color:"var(--txt1)"}}>{authUser.name}</p>
                 {isAdmin&&<p style={{fontSize:9,color:"#d97706"}}>관리자</p>}
               </div>
             </div>
@@ -1558,7 +1558,7 @@ export default function AppShell() {
             <button
               onClick={()=>setAuthUser(null)}
               className="flex h-8 items-center gap-1.5 rounded-xl border px-3 font-semibold transition-all hover:bg-red-50 hover:border-red-200 hover:text-red-500"
-              style={{borderColor:"#e4e8ee",color:"#9aa3b2",fontSize:12}}
+              style={{borderColor:"var(--border)",color:"var(--txt3)",fontSize:12}}
               title="로그아웃">
               <LogOut size={13}/>
               <span className="hidden sm:inline">로그아웃</span>
@@ -1567,15 +1567,15 @@ export default function AppShell() {
         </header>
 
         {/* scrollable content */}
-        <main className="flex-1 overflow-y-auto" style={{background:"#f2f4f7", marginLeft: 10}}>
+        <main className="flex-1 overflow-y-auto" style={{background:"var(--bg)"}}>
           <div className="mx-auto max-w-[1440px] p-5">
             {/* 대시보드 전용 환영 헤더 */}
             {nav==="dashboard"&&(
               <div
                 className="mb-5 flex items-center justify-between overflow-hidden rounded-2xl px-7 py-5"
                 style={{
-                  background:"linear-gradient(135deg,#0a1628 0%,#0e2242 50%,#0a1f3a 100%)",
-                  boxShadow:"0 4px 24px rgba(10,22,40,0.3)",
+                  background:"linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)",
+                  boxShadow:"0 4px 24px rgba(15,23,42,0.25)",
                   animation:"card-in 0.4s ease both",
                 }}
               >

@@ -6,15 +6,15 @@ import { useState, useRef } from "react";
 import { X, Search, AlertTriangle, Save, ChevronDown, ChevronUp, ArrowLeft, ChevronRight as ChevRight, Upload, Download, Printer, FileSpreadsheet } from "lucide-react";
 import { exportToExcel, importFromExcel, printContent, downloadTemplate, type ExcelRow, type ExportOptions } from "@/lib/excelUtils";
 
-// ── 배지 색상 맵 ─────────────────────────────────────────────────────────────
+// ── 배지 색상 맵 (박스 배경과 조화) ─────────────────────────────────────────────
 export const BC: Record<string, string> = {
-  blue:   "bg-indigo-50  text-indigo-600",
-  green:  "bg-emerald-50 text-emerald-600",
-  amber:  "bg-amber-50   text-amber-600",
-  red:    "bg-red-50     text-red-500",
-  gray:   "bg-slate-100  text-slate-500",
+  blue:   "bg-sky-50     text-sky-700",
+  green:  "bg-emerald-50 text-emerald-700",
+  amber:  "bg-amber-50   text-amber-700",
+  red:    "bg-red-50     text-red-600",
+  gray:   "bg-slate-100  text-slate-600",
   sky:    "bg-sky-50     text-sky-600",
-  purple: "bg-purple-50  text-purple-600",
+  purple: "bg-violet-50  text-violet-600",
 };
 
 // ── 공통 유틸 ─────────────────────────────────────────────────────────────────
@@ -29,8 +29,8 @@ export const pctFmt = (a: number, b: number) => b ? (a / b * 100).toFixed(1) + "
 // ── 배지 ─────────────────────────────────────────────────────────────────────
 export function Badge({ l, c }: { l: string; c: string }) {
   return (
-    <span className={`inline-flex h-[18px] items-center rounded-full px-2 font-medium ${BC[c] ?? BC.gray}`}
-      style={{ fontSize: 9 }}>{l}</span>
+    <span className={`inline-flex h-5 items-center rounded-md px-2 font-medium ${BC[c] ?? BC.gray}`}
+      style={{ fontSize: 11 }}>{l}</span>
   );
 }
 
@@ -41,12 +41,12 @@ export function Modal({
   title: string; onClose: () => void; children: React.ReactNode; wide?: boolean; xl?: boolean;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1e2247]/50 p-4 backdrop-blur-sm">
-      <div className={`flex flex-col w-full rounded-2xl bg-white shadow-2xl ${xl ? "max-w-4xl" : wide ? "max-w-2xl" : "max-w-lg"}`}>
-        <div className="flex shrink-0 items-center justify-between border-b border-slate-100 px-5 py-3.5">
-          <span className="font-semibold text-[#1e2247]" style={{ fontSize: 13 }}>{title}</span>
-          <button onClick={onClose} className="flex h-6 w-6 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 transition-colors">
-            <X size={13} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
+      <div className={`flex flex-col w-full rounded-2xl bg-white shadow-xl border border-slate-200/80 ${xl ? "max-w-4xl" : wide ? "max-w-2xl" : "max-w-lg"}`}>
+        <div className="flex shrink-0 items-center justify-between border-b border-slate-100 px-5 py-4 bg-slate-50/80 rounded-t-2xl">
+          <span className="font-semibold text-slate-800" style={{ fontSize: 15 }}>{title}</span>
+          <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-200/60 hover:text-slate-700 transition-colors">
+            <X size={16} />
           </button>
         </div>
         <div className="overflow-y-auto px-5 py-4" style={{ maxHeight: "85vh" }}>{children}</div>
@@ -58,8 +58,8 @@ export function Modal({
 // ── 폼 필드 ──────────────────────────────────────────────────────────────────
 export function Fld({ label, req, children }: { label: string; req?: boolean; children: React.ReactNode }) {
   return (
-    <label className="flex flex-col gap-1">
-      <span className="font-semibold text-slate-500" style={{ fontSize: 10 }}>
+    <label className="flex flex-col gap-1.5">
+      <span className="font-medium text-slate-600" style={{ fontSize: 12 }}>
         {label}{req && <span className="ml-0.5 text-red-500">*</span>}
       </span>
       {children}
@@ -70,7 +70,7 @@ export function Fld({ label, req, children }: { label: string; req?: boolean; ch
 export function Inp(p: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input {...p}
-      className="h-8 w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 text-[11px] text-[#1e2247] outline-none transition placeholder:text-slate-400 focus:border-[#5c6bc0] focus:bg-white focus:ring-2 focus:ring-[#5c6bc0]/15" />
+      className="h-9 w-full rounded-lg border border-slate-200 bg-slate-50/80 px-3 text-[13px] text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[var(--primary)] focus:bg-white focus:ring-2 focus:ring-[var(--primary-soft)]" />
   );
 }
 
@@ -84,7 +84,7 @@ export function Textarea(p: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
 export function Sl({ v, set, opts }: { v: string; set: (x: string) => void; opts: { value: string; label: string }[] }) {
   return (
     <select value={v} onChange={e => set(e.target.value)}
-      className="h-8 w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 text-[11px] text-[#1e2247] outline-none transition focus:border-[#5c6bc0] focus:bg-white">
+      className="h-9 w-full rounded-lg border border-slate-200 bg-slate-50/80 px-3 text-[13px] text-slate-800 outline-none transition focus:border-[var(--primary)] focus:bg-white">
       {opts.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
     </select>
   );
@@ -98,16 +98,16 @@ export function Btn({
   disabled?: boolean; children: React.ReactNode; icon?: React.ReactNode; xs?: boolean;
 }) {
   const cls: Record<string, string> = {
-    primary:   "bg-[#0d7f8a] text-white hover:bg-[#0a6570] shadow-sm",
-    secondary: "bg-white text-[#0a2535] border border-[#dde3e8] hover:bg-[#f5f7f9] shadow-sm",
-    ghost:     "text-slate-500 hover:bg-slate-100",
+    primary:   "bg-[var(--primary)] text-white hover:bg-[var(--primary-hover)] shadow-sm hover:shadow",
+    secondary: "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 hover:border-slate-300 shadow-sm",
+    ghost:     "text-slate-600 hover:bg-slate-100",
     danger:    "bg-red-500 text-white hover:bg-red-600 shadow-sm",
-    success:   "bg-emerald-500 text-white hover:bg-emerald-600 shadow-sm",
+    success:   "bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm",
   };
   return (
     <button onClick={onClick} disabled={disabled}
-      className={`inline-flex items-center gap-1.5 rounded-xl font-semibold transition-all disabled:opacity-50 ${cls[v]} ${xs ? "h-6 px-2.5" : "h-8 px-3"}`}
-      style={{ fontSize: xs ? 10 : 12 }}>
+      className={`inline-flex items-center gap-1.5 rounded-lg font-semibold transition-all disabled:opacity-50 ${cls[v]} ${xs ? "h-7 px-2.5" : "h-9 px-4"}`}
+      style={{ fontSize: xs ? 11 : 13 }}>
       {icon}{children}
     </button>
   );
@@ -118,10 +118,10 @@ export function PgHdr({
   title, sub, actions,
 }: { title: string; sub?: string; actions?: React.ReactNode }) {
   return (
-    <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
+    <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
       <div>
-        <h1 className="font-black text-[#0a2535]" style={{ fontSize: 24, letterSpacing: "-0.02em" }}>{title}</h1>
-        {sub && <p className="mt-1 text-slate-400" style={{ fontSize: 12 }}>{sub}</p>}
+        <h1 className="font-bold text-slate-800" style={{ fontSize: 22, letterSpacing: "-0.02em" }}>{title}</h1>
+        {sub && <p className="mt-1.5 text-slate-500" style={{ fontSize: 13 }}>{sub}</p>}
       </div>
       {actions && <div className="flex items-center gap-2">{actions}</div>}
     </div>
@@ -135,16 +135,16 @@ export function Tabs({ tabs, active, set }: {
   set: (k: string) => void;
 }) {
   return (
-    <div className="mb-4 flex flex-wrap gap-1.5 border-b border-[#eef1f8] pb-3">
+    <div className="mb-4 flex flex-wrap gap-2 border-b border-slate-200 pb-3">
       {tabs.map(t => (
         <button key={t.key} onClick={() => set(t.key)}
-          className={`flex h-7 items-center gap-1 rounded-full px-3 font-semibold transition-all ${active === t.key
-            ? "bg-[#0d7f8a] text-white shadow-sm"
-            : "bg-white text-slate-500 border border-[#e8eaf0] hover:text-[#0a2535]"
-          }`} style={{ fontSize: 12 }}>
+          className={`flex h-8 items-center gap-1.5 rounded-lg px-4 font-medium transition-all ${active === t.key
+            ? "bg-[var(--primary)] text-white shadow-sm"
+            : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:text-slate-800"
+          }`} style={{ fontSize: 13 }}>
           {t.label}
           {t.n !== undefined && (
-            <span className={`rounded-full px-1 font-bold ${active === t.key ? "text-white/70" : "text-slate-400"}`} style={{ fontSize: 10 }}>{t.n}</span>
+            <span className={`rounded px-1.5 font-semibold ${active === t.key ? "text-white/80" : "text-slate-400"}`} style={{ fontSize: 11 }}>{t.n}</span>
           )}
         </button>
       ))}
@@ -155,9 +155,9 @@ export function Tabs({ tabs, active, set }: {
 // ── 검색창 ───────────────────────────────────────────────────────────────────
 export function Srch({ v, set, ph }: { v: string; set: (s: string) => void; ph: string }) {
   return (
-    <div className="mb-3 flex h-8 items-center gap-2 rounded-lg border border-[#e8eaf0] bg-white px-3 shadow-sm transition focus-within:border-[#5c6bc0] focus-within:ring-2 focus-within:ring-[#5c6bc0]/15">
-      <Search size={12} className="shrink-0 text-slate-400" />
-      <input className="flex-1 bg-transparent text-[11px] text-[#1e2247] outline-none placeholder:text-slate-400"
+    <div className="mb-3 flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 shadow-sm transition focus-within:border-[var(--primary)] focus-within:ring-2 focus-within:ring-[var(--primary-soft)]">
+      <Search size={14} className="shrink-0 text-slate-400" />
+      <input className="flex-1 bg-transparent text-[13px] text-slate-800 outline-none placeholder:text-slate-400"
         placeholder={ph} value={v} onChange={e => set(e.target.value)} />
     </div>
   );
@@ -166,21 +166,21 @@ export function Srch({ v, set, ph }: { v: string; set: (s: string) => void; ph: 
 // ── 데이터 테이블 ─────────────────────────────────────────────────────────────
 export function Tbl({ cols, children }: { cols: string[]; children: React.ReactNode }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-[#e8eaf0] bg-white shadow-sm">
+    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-[#eef1f8] bg-[#f7f8fc]">
+            <tr className="border-b border-slate-100 bg-slate-50/90">
               {cols.map(c => (
                 <th key={c}
-                  className={`whitespace-nowrap px-3 py-3 text-left font-bold uppercase tracking-widest text-slate-400 ${c.includes("↓") ? "text-right" : ""}`}
-                  style={{ fontSize: 10 }}>
+                  className={`whitespace-nowrap px-4 py-3.5 text-left font-semibold tracking-wide text-slate-600 ${c.includes("↓") ? "text-right" : ""}`}
+                  style={{ fontSize: 12 }}>
                   {c.replace("↓", "")}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#f3f4f9]">{children}</tbody>
+          <tbody className="divide-y divide-slate-100">{children}</tbody>
         </table>
       </div>
     </div>
@@ -190,7 +190,7 @@ export function Tbl({ cols, children }: { cols: string[]; children: React.ReactN
 export function TR({ children, onClick }: { children: React.ReactNode; onClick?: () => void }) {
   return (
     <tr onClick={onClick}
-      className={`transition-colors text-[11px] ${onClick ? "cursor-pointer hover:bg-indigo-50/30" : "hover:bg-[#f7f8fc]/60"}`}>
+      className={`transition-colors text-[13px] ${onClick ? "cursor-pointer hover:bg-sky-50/40" : "hover:bg-slate-50/60"}`}>
       {children}
     </tr>
   );
@@ -203,14 +203,14 @@ export function TD({
   mono?: boolean; bold?: boolean; warn?: boolean; cls?: string;
 }) {
   return (
-    <td className={`px-3 py-2 ${r ? "text-right" : ""} ${muted ? "text-slate-400" : ""} ${mono ? "font-mono text-[10px]" : ""} ${bold ? "font-semibold text-[#1e2247]" : ""} ${warn ? "font-bold text-red-500" : ""} ${cls}`}>
+    <td className={`px-4 py-2.5 ${r ? "text-right" : ""} ${muted ? "text-slate-500" : ""} ${mono ? "font-mono text-[11px]" : ""} ${bold ? "font-semibold text-slate-800" : ""} ${warn ? "font-semibold text-red-600" : ""} ${cls}`}>
       {children}
     </td>
   );
 }
 
 export function NoRow({ n, msg = "데이터가 없습니다" }: { n: number; msg?: string }) {
-  return <tr><td colSpan={n} className="py-10 text-center text-slate-400" style={{ fontSize: 11 }}>{msg}</td></tr>;
+  return <tr><td colSpan={n} className="py-12 text-center text-slate-500" style={{ fontSize: 13 }}>{msg}</td></tr>;
 }
 
 // ── 진행 막대 ─────────────────────────────────────────────────────────────────
@@ -234,14 +234,14 @@ export function StatC({
   label, value, unit, warn, sub,
 }: { label: string; value: string | number; unit?: string; warn?: boolean; sub?: string }) {
   return (
-    <div className="rounded-2xl border border-[#e0e6ea] bg-white p-4 shadow-sm text-center" style={{margin:8}}>
-      <p className="text-slate-400 font-medium" style={{ fontSize: 11 }}>{label}</p>
-      <p className={`mt-2 font-black leading-none tabular-nums ${warn ? "text-amber-500" : "text-[#0a2535]"}`}
-        style={{ fontSize: 28, letterSpacing: "-0.02em" }}>
+    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm text-center transition-shadow hover:shadow-md" style={{margin:8}}>
+      <p className="text-slate-500 font-medium" style={{ fontSize: 12 }}>{label}</p>
+      <p className={`mt-2 font-bold leading-none tabular-nums ${warn ? "text-amber-600" : "text-slate-800"}`}
+        style={{ fontSize: 22, letterSpacing: "-0.02em" }}>
         {value}
-        <span className="ml-1 font-semibold text-slate-300" style={{ fontSize: 13 }}>{unit}</span>
+        {unit && <span className="ml-1 font-medium text-slate-400" style={{ fontSize: 12 }}>{unit}</span>}
       </p>
-      {sub && <p className="mt-1.5 text-slate-400" style={{ fontSize: 11 }}>{sub}</p>}
+      {sub && <p className="mt-2 text-slate-500" style={{ fontSize: 11 }}>{sub}</p>}
     </div>
   );
 }
@@ -249,9 +249,9 @@ export function StatC({
 // ── 알림 배너 ─────────────────────────────────────────────────────────────────
 export function AlertBanner({ msg }: { msg: string }) {
   return (
-    <div className="mb-4 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3">
-      <AlertTriangle size={15} className="mt-0.5 shrink-0 text-amber-500" />
-      <p className="font-semibold text-amber-800" style={{ fontSize: 13 }}>{msg}</p>
+    <div className="mb-4 flex items-start gap-3 rounded-xl border border-amber-200/80 bg-amber-50/90 px-4 py-3.5">
+      <AlertTriangle size={16} className="mt-0.5 shrink-0 text-amber-600" />
+      <p className="font-medium text-amber-800" style={{ fontSize: 13 }}>{msg}</p>
     </div>
   );
 }
@@ -262,14 +262,14 @@ export function SectionCard({
 }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="rounded-2xl border border-[#e0e6ea] bg-white shadow-sm" style={{margin:8}}>
+    <div className="rounded-xl border border-slate-200 bg-white shadow-sm" style={{margin:8}}>
       <button
-        className="flex w-full items-center justify-between px-5 py-3.5 transition-colors hover:bg-[#f7f8fc]"
+        className="flex w-full items-center justify-between px-5 py-4 transition-colors hover:bg-slate-50/80 rounded-t-xl"
         onClick={() => setOpen(o => !o)}>
-        <span className="font-bold text-[#0a2535]" style={{ fontSize: 14, letterSpacing: "-0.01em" }}>{title}</span>
-        {open ? <ChevronUp size={14} className="text-slate-400" /> : <ChevronDown size={14} className="text-slate-400" />}
+        <span className="font-semibold text-slate-800" style={{ fontSize: 14 }}>{title}</span>
+        {open ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronDown size={16} className="text-slate-400" />}
       </button>
-      {open && <div className="border-t border-[#eef1f8] p-5">{children}</div>}
+      {open && <div className="border-t border-slate-100 p-5">{children}</div>}
     </div>
   );
 }
@@ -312,33 +312,33 @@ export function PageModal({
   return (
     <div
       className="fixed z-40 flex flex-col overflow-hidden"
-      style={{ top: 52, left: 196, right: 0, bottom: 0, background: "#eef1f8" }}
+      style={{ top: 52, left: 220, right: 0, bottom: 0, background: "var(--bg)" }}
     >
       {/* 페이지 헤더 */}
       <div
-        className="flex h-[52px] shrink-0 items-center justify-between border-b bg-white px-6"
-        style={{ borderColor: "#e8eaf0", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
+        className="flex h-[52px] shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6"
+        style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
       >
         <div className="flex items-center gap-2">
           <button
             onClick={onClose}
-            className="flex items-center gap-1 rounded-lg px-2 py-1 transition-colors hover:bg-slate-100 text-slate-500 hover:text-[#1e2247]"
-            style={{ fontSize: 11 }}
+            className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 transition-colors hover:bg-slate-100 text-slate-600 hover:text-slate-800"
+            style={{ fontSize: 12 }}
           >
-            <ArrowLeft size={13} />
+            <ArrowLeft size={14} />
             {section && <span className="font-medium">{section}</span>}
           </button>
-          <ChevRight size={11} className="text-slate-300" />
-          <span className="font-semibold text-[#1e2247]" style={{ fontSize: 13 }}>{title}</span>
+          <ChevRight size={12} className="text-slate-300" />
+          <span className="font-semibold text-slate-800" style={{ fontSize: 14 }}>{title}</span>
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           {actions}
-          <div className="mx-1 h-4 w-px bg-[#e8eaf0]" />
+          <div className="mx-1 h-4 w-px bg-slate-200" />
           <button
             onClick={onClose}
-            className="flex h-7 w-7 items-center justify-center rounded-lg border border-[#e8eaf0] bg-white text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500 hover:border-red-200"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-700"
           >
-            <X size={13} />
+            <X size={14} />
           </button>
         </div>
       </div>
@@ -376,20 +376,18 @@ export function SectionLanding({
   return (
     <div>
       <div className="mb-7">
-        <h1 className="font-black text-[#0a2535]" style={{ fontSize: 24, letterSpacing: "-0.02em" }}>{title}</h1>
-        <p className="mt-1.5 text-slate-400" style={{ fontSize: 13 }}>{sub}</p>
+        <h1 className="font-bold text-slate-800" style={{ fontSize: 22, letterSpacing: "-0.02em" }}>{title}</h1>
+        <p className="mt-2 text-slate-500" style={{ fontSize: 14 }}>{sub}</p>
       </div>
       <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))" }}>
         {cards.map(c => {
           const CIcon = c.Icon;
-          const color = c.color ?? "#0d7f8a";
-          const bgAlpha = `${color}18`;
+          const color = c.color ?? "var(--primary)";
           return (
             <button
               key={c.key}
               onClick={() => onOpen(c.key)}
-              className="group relative flex flex-col items-center rounded-2xl border bg-white p-6 text-center shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#0d7f8a] hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#0d7f8a]/20"
-              style={{ borderColor: "#e0e6ea" }}
+              className="group relative flex flex-col items-center rounded-xl border border-slate-200 bg-white p-6 text-center shadow-sm transition-all hover:-translate-y-1 hover:border-slate-300 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
             >
               {/* 알림 뱃지 */}
               {c.alert != null && c.alert > 0 && (
@@ -403,8 +401,8 @@ export function SectionLanding({
 
               {/* 아이콘 — 중앙 */}
               <div
-                className="flex h-14 w-14 items-center justify-center rounded-2xl"
-                style={{ background: bgAlpha, color }}
+                className="flex h-14 w-14 items-center justify-center rounded-xl transition-colors"
+                style={{ background: c.color ? `${c.color}15` : "var(--primary-soft)", color: c.color ?? "var(--primary)" }}
               >
                 <CIcon size={26} />
               </div>
@@ -412,18 +410,18 @@ export function SectionLanding({
               {/* 제목 + 설명 — 중앙 */}
               <div className="mt-4 flex-1">
                 <p
-                  className="font-black text-[#0a2535] transition-colors group-hover:text-[#0d7f8a]"
-                  style={{ fontSize: 16, letterSpacing: "-0.01em" }}
+                  className="font-semibold text-slate-800 transition-colors group-hover:text-[var(--primary)]"
+                  style={{ fontSize: 15 }}
                 >
                   {c.label}
                 </p>
-                <p className="mt-1.5 leading-relaxed text-slate-400" style={{ fontSize: 12 }}>
+                <p className="mt-2 leading-relaxed text-slate-500" style={{ fontSize: 13 }}>
                   {c.desc}
                 </p>
               </div>
 
               {/* 하단 메타 + 열기 — 중앙 */}
-              <div className="mt-4 flex w-full items-center justify-center gap-3 border-t border-[#f0f3f5] pt-3">
+              <div className="mt-4 flex w-full items-center justify-center gap-3 border-t border-slate-100 pt-3">
                 {c.count != null && (
                   <span className="tabular-nums text-slate-400" style={{ fontSize: 12 }}>
                     {c.count}건
@@ -433,8 +431,8 @@ export function SectionLanding({
                   <span className="text-slate-400" style={{ fontSize: 12 }}>{c.extra}</span>
                 )}
                 <span
-                  className="flex items-center gap-1 font-bold transition-all group-hover:gap-1.5"
-                  style={{ color, fontSize: 13 }}
+                  className="flex items-center gap-1 font-semibold transition-all group-hover:gap-1.5"
+                  style={{ color: c.color ?? "var(--primary)", fontSize: 13 }}
                 >
                   열기 <ChevRight size={13} />
                 </span>

@@ -5,7 +5,7 @@
 import { useMemo, useRef, useCallback } from "react";
 import { Download, Printer, FileBarChart2, FileDown } from "lucide-react";
 import { Btn, PgHdr, Tbl, TR, TD, NoRow, Badge, PBar, StatC, fc, fw, fp, fd } from "./shared";
-import { MEETING_INFO } from "@/lib/fact-plan-data";
+import { MEETING_INFO, CUSTOMER_SALES } from "@/lib/fact-plan-data";
 
 // ── 인쇄 / PDF 유틸리티 ────────────────────────────────────────────────────────
 function triggerPrint(title: string) {
@@ -97,12 +97,13 @@ const DEFAULT_DATA: ReportData = {
     { category: "BUSH",         month_plan: 528000000, month_actual: 341815317 },
     { category: "이너씰",       month_plan: 49000000,  month_actual: 42450140 },
   ],
-  customers: [
-    { customer: "영동",     target_amount: 335000000, actual_amount: 300090000, gap: -34910000, action_items: ["차기 발주 확보 요청","니코 바이그로멧 긴급 조달"] },
-    { customer: "익THK",    target_amount: 150000000, actual_amount: 223530000, gap:  73530000, action_items: ["AV 진행 추급","삼성테크노 집중 발주"] },
-    { customer: "화성업",   target_amount: 613150000, actual_amount: 568060000, gap: -45090000, action_items: ["HKMC OEM 발주 감소 대응","코모스 공장 조립계획 접수"] },
-    { customer: "SECO AIA", target_amount: 731450000, actual_amount: 659960000, gap: -71490000, action_items: ["KD 출고 진행","방진AS 본발주 접수"] },
-  ],
+  customers: CUSTOMER_SALES.map(c => ({
+    customer: c.customer,
+    target_amount: c.target * 1000,
+    actual_amount: c.actual * 1000,
+    gap: c.gap * 1000,
+    action_items: c.notes ? [c.notes] : [],
+  })),
   pos: [
     { po_no: "PO-2026-03-001", vendor: "㈜한국폼",    item_name: "BUSH 2421750 원자재",   total_amount: 1600000,  status: "발주",    due_date: "2026-03-10" },
     { po_no: "PO-2026-03-002", vendor: "금속부품㈜",  item_name: "BUSH 760 TYPE 소재",    total_amount: 600000,   status: "부분입고",due_date: "2026-03-08" },
@@ -122,12 +123,8 @@ function ReportHdr({ no, week, range, writer }: { no: string; week: string; rang
       <div className="flex items-start justify-between px-7 py-6">
         <div className="flex items-center gap-4">
           {/* 영동테크 로고 마크 */}
-          <div
-            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl font-black text-white shadow-lg"
-            style={{ background: "linear-gradient(135deg,#0d7f8a,#0a5f6e)", fontSize: 18, letterSpacing: "-0.02em" }}
-          >YD</div>
           <div>
-            <p className="font-bold uppercase tracking-[0.2em]" style={{ fontSize: 9, color: "#0d7f8a" }}>영동테크 주식회사</p>
+            <p className="font-bold uppercase tracking-[0.2em] text-white" style={{ fontSize: 10 }}>영동테크 주식회사</p>
             <h2 className="mt-1.5 font-black tracking-tight text-white" style={{ fontSize: 22 }}>02월(04주차) 주간 회의</h2>
             <p className="mt-1" style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>
               {MEETING_INFO.title} &nbsp;|&nbsp; 2026년 {MEETING_INFO.yearPlan}억 매출계획({MEETING_INFO.monthPlan}억/02월) &nbsp;|&nbsp; 업무기간 {MEETING_INFO.workPeriod}
@@ -296,7 +293,7 @@ export default function ReportSection({ data: extData }: ReportSectionProps) {
         </Tbl>
 
         {/* 공정 불량 현황 */}
-        <h4 className="mb-2 mt-5 font-semibold text-[#1e2247]" style={{ fontSize: 11 }}>2-2. 공정 불량 현황 (3월 1주차)</h4>
+        <h4 className="mb-2 mt-5 font-semibold text-[#1e2247]" style={{ fontSize: 11 }}>2-2. 공정 불량 현황 (2월 4주차)</h4>
         <Tbl cols={["제품군", "품번", "불량수↓", "불량금액↓", "PPM↓", "주요원인", "조치내용", "담당", "완료일", "상태"]}>
           {d.defects.map((def, i) => {
             const stC: Record<string, string> = { 발생: "red", 원인조사: "amber", 조치완료: "blue", 모니터링: "green" };

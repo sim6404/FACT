@@ -256,8 +256,8 @@ function DailyPage({ wos, daily, setDaily }: {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-xl border border-sky-200 bg-sky-50 p-4">
-        <p className="mb-2 font-bold text-sky-800" style={{ fontSize: 12 }}>□ 2월 4주차 투입시간 관리 (PPT 기준)</p>
+      <div className="rounded-xl border border-sky-200/80 bg-sky-50/90 p-4">
+        <p className="mb-2 font-semibold text-sky-800" style={{ fontSize: 13 }}>□ 2월 4주차 투입시간 관리 (PPT 기준)</p>
         <div className="flex flex-wrap gap-4">
           <StatC label="주간 계획" value={INPUT_HOURS.dayShift.plan} unit="h" />
           <StatC label="주간 실적" value={INPUT_HOURS.dayShift.actual} unit="h" />
@@ -327,13 +327,13 @@ function WorkerPage({ workers, setWorkers }: {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-4">
-        <p className="mb-2 font-bold text-indigo-800" style={{ fontSize: 12 }}>□ 인력 운영 현황 (PPT 02월 04주차)</p>
+      <div className="rounded-xl border border-slate-200/80 bg-slate-50/90 p-4">
+        <p className="mb-2 font-semibold text-slate-800" style={{ fontSize: 13 }}>□ 인력 운영 현황 (PPT 02월 04주차)</p>
         <div className="flex flex-wrap items-center gap-4">
           <StatC label="계획인원" value={LABOR_STATUS.plan} unit="명" />
           <StatC label="투입인원" value={LABOR_STATUS.actual} unit="명" />
           <StatC label="담당자" value={RESPONSIBLES.productionManager} unit="" />
-          <p className="text-indigo-700" style={{ fontSize: 10 }}>생산 {RESPONSIBLES.productionLeader}, 검사 {RESPONSIBLES.qualityLeader}</p>
+          <p className="text-slate-600" style={{ fontSize: 12 }}>생산 {RESPONSIBLES.productionLeader}, 검사 {RESPONSIBLES.qualityLeader}</p>
         </div>
       </div>
       <div className="grid grid-cols-3 gap-4">
@@ -465,8 +465,8 @@ function WeeklyPage({ weekly }: { weekly: WeeklySummary[] }) {
 function CoatingPage() {
   return (
     <div className="space-y-5">
-      <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
-        <p className="mb-2 font-bold text-amber-800" style={{ fontSize: 12 }}>□ 3월 도포실 예상계획</p>
+      <div className="rounded-xl border border-amber-200/80 bg-amber-50/90 p-4">
+        <p className="mb-2 font-semibold text-amber-800" style={{ fontSize: 13 }}>□ 3월 도포실 예상계획</p>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <StatC label="3월 필요원 (주간)" value={COATING_ROOM.marchNeed.day} unit="명" />
           <StatC label="3월 필요원 (야간)" value={COATING_ROOM.marchNeed.night} unit="명" />

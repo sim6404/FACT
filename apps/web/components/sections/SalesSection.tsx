@@ -453,7 +453,7 @@ export default function SalesSection() {
   return (
     <div>
       <div className="mb-6">
-        <p className="mb-3 font-bold text-[#0a2535]" style={{ fontSize: 14 }}>전체 매출 현황 – 2/28 월 마감 기준 (천원)</p>
+        <p className="mb-3 font-semibold text-slate-800" style={{ fontSize: 15 }}>전체 매출 현황 – 2/28 월 마감 기준 (천원)</p>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           {CUSTOMER_SALES.map((c) => (
             <div
@@ -463,15 +463,15 @@ export default function SalesSection() {
             >
               <p className="font-bold text-[#0d1117]" style={{ fontSize: 13 }}>{c.customer}</p>
               <div className="mt-2 flex items-baseline gap-1">
-                <span className={`font-black ${c.rate >= 95 ? "text-emerald-600" : c.rate >= 90 ? "text-amber-600" : "text-red-500"}`} style={{ fontSize: 22 }}>{c.rate.toFixed(1)}%</span>
+                <span className={`font-bold ${c.rate >= 95 ? "text-emerald-600" : c.rate >= 90 ? "text-amber-600" : "text-red-500"}`} style={{ fontSize: 20 }}>{c.rate.toFixed(1)}%</span>
                 <span className="text-slate-500" style={{ fontSize: 10 }}>달성</span>
               </div>
-              <p className="mt-1 text-slate-500" style={{ fontSize: 10 }}>목표 {c.target.toLocaleString()} / 실적 {c.actual.toLocaleString()} ({c.gap >= 0 ? "+" : ""}{c.gap.toLocaleString()})</p>
+              <p className="mt-1.5 text-slate-500" style={{ fontSize: 12 }}>목표 {c.target.toLocaleString()} / 실적 {c.actual.toLocaleString()} ({c.gap >= 0 ? "+" : ""}{c.gap.toLocaleString()})</p>
               {c.notes && <p className="mt-1 truncate text-amber-600" style={{ fontSize: 9 }}>{c.notes}</p>}
             </div>
           ))}
         </div>
-        <p className="mt-2 text-slate-500" style={{ fontSize: 11 }}>TOTAL: 목표 {SALES_TOTAL.target.toLocaleString()}천 / 실적 {SALES_TOTAL.actual.toLocaleString()}천 / 차이 {SALES_TOTAL.gap.toLocaleString()}천 (PPT 주간회의 26년 02월 04주차)</p>
+        <p className="mt-2 text-slate-500" style={{ fontSize: 12 }}>TOTAL: 목표 {SALES_TOTAL.target.toLocaleString()}천 / 실적 {SALES_TOTAL.actual.toLocaleString()}천 / 차이 {SALES_TOTAL.gap.toLocaleString()}천 (PPT 주간회의 26년 02월 04주차)</p>
       </div>
       <SectionLanding
         title="영업 개발 / 수주 관리"

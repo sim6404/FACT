@@ -67,9 +67,9 @@ export const LABOR_STATUS = {
   ],
 };
 
-// ─── 투입시간 (Slide 5) ─────────────────────────────────────────────────
+// ─── 투입시간 (Slide 5, 2월 4주차 2.23~2.27) ───────────────────────────────
 export const INPUT_HOURS = {
-  dayShift: { plan: 2660, extra: 20, total: 2788, actual: 2640, rate: 99.3 },
+  dayShift: { plan: 2660, extra: 128, total: 2788, actual: 2640, rate: 99.3 },
   nightShift: { plan: 700, extra: 40, total: 740, actual: 700, rate: 100.0 },
 };
 
@@ -83,10 +83,10 @@ export const COATING_ROOM = {
 
 // ─── 고객사별 매출 (영업 Slide, 2026.02.28 월 마감 기준) ────────────────────
 export const CUSTOMER_SALES = [
-  { customer: "영동테크", target: 32000, actual: 30009, gap: -1991, rate: 93.8, notes: "니코 바이그로멧 재고부족, SR 이너씰 백오더 확인" },
-  { customer: "삼익 THK", target: 15000, actual: 22353, gap: 7353, rate: 149.0, notes: "해외 공장 대량 발주, 미입고 1억7천만원 분납 진행" },
-  { customer: "평화산업", target: 61315, actual: 56806, gap: -4509, rate: 92.6, notes: "주력 750/760/780 OEM 발주량 저조, PHA 5천만원 수주" },
-  { customer: "SECO AIA", target: 73145, actual: 65996, gap: -7149, rate: 90.2, notes: "혼플레이트 소요량 급감, KD 출고 완료(2/27)" },
+  { customer: "자동차", target: 32000, actual: 30009, gap: -1991, rate: 93.8, notes: "기타 매출 부문(현대합성공업/트래닛) 예상 발주 대비 저조, HKMC OEM 계획 대비 실적 저조로 발주 수량 격감, 차월 예상 발주 확인 요청" },
+  { customer: "삼익 THK", target: 15000, actual: 22353, gap: 7353, rate: 149.0, notes: "해외 공장 대량 발주(요령/야마구찌), 미입고 1억7천만원 분납 진행중" },
+  { customer: "평화산업", target: 61315, actual: 56806, gap: -4509, rate: 92.6, notes: "주력 750/760/780 OEM 발주량 저조, PHA 수출 5천만원 수주" },
+  { customer: "SECO AIA", target: 73145, actual: 65996, gap: -7149, rate: 90.2, notes: "혼플레이트 소요량 급감, KD 출고 진행 완료(2/27)" },
 ];
 export const SALES_TOTAL = { target: 181461, actual: 175166, gap: -7007 };  // 천원
 

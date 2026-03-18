@@ -302,8 +302,8 @@ function ReworkPage({ reworks, setReworks }: { reworks: ReworkRecord[]; setRewor
 function PpmSummaryCards() {
   return (
     <div className="mb-6">
-      <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
-        <p className="mb-2 font-bold text-amber-800" style={{ fontSize: 12 }}>□ 2월 품질 합계 (PPT 02월 04주차)</p>
+      <div className="mb-4 rounded-xl border border-slate-200/80 bg-slate-50/90 p-4">
+        <p className="mb-2 font-semibold text-slate-800" style={{ fontSize: 13 }}>□ 2월 품질 합계 (PPT 02월 04주차)</p>
         <div className="flex flex-wrap gap-4">
           <StatC label="평균 PPM" value={DASHBOARD_KPIS.avg_ppm.toLocaleString()} unit="PPM" />
           <StatC label="불량금액" value={`${Math.round(DASHBOARD_KPIS.defect_amount/10000).toLocaleString()}만`} unit="원" warn />

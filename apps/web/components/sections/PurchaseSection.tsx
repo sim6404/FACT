@@ -75,17 +75,17 @@ function PoPage({ data, setData }: { data: PurchaseOrder[]; setData: React.Dispa
   return (
     <div className="space-y-5">
       {PURCHASE_RATIO_ALERT.length > 0 && (
-        <div className="rounded-xl border border-amber-300 bg-amber-50 p-4">
-          <p className="mb-2 flex items-center gap-2 font-bold text-amber-800" style={{ fontSize: 12 }}>
+        <div className="rounded-xl border border-amber-200/80 bg-amber-50/90 p-4">
+          <p className="mb-2 flex items-center gap-2 font-semibold text-amber-800" style={{ fontSize: 13 }}>
             <AlertTriangle size={14} />
             매입비율 경보 (75% 미달 / 110% 초과)
           </p>
           <div className="space-y-1">
             {PURCHASE_RATIO_ALERT.map((r, i) => (
-              <div key={i} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-white/80 px-3 py-2">
-                <span className="font-semibold text-slate-700" style={{ fontSize: 11 }}>{r.material}</span>
-                <span className="text-slate-500" style={{ fontSize: 10 }}>계획 {fc(r.planned)} / 실매입 {fc(r.actual)}</span>
-                <span className={`font-bold ${r.ratio < 75 ? "text-red-600" : "text-amber-600"}`} style={{ fontSize: 11 }}>
+              <div key={i} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-white/90 px-3 py-2.5">
+                <span className="font-medium text-slate-700" style={{ fontSize: 12 }}>{r.material}</span>
+                <span className="text-slate-500" style={{ fontSize: 12 }}>계획 {fc(r.planned)} / 실매입 {fc(r.actual)}</span>
+                <span className={`font-semibold ${r.ratio < 75 ? "text-red-600" : "text-amber-600"}`} style={{ fontSize: 12 }}>
                   {r.ratio}% — {r.status}
                 </span>
               </div>

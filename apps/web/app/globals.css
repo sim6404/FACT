@@ -2,18 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── CSS 변수 (디자인 토큰) ─────────────────────────────────────────────────── */
+/* ── FACT ERP 디자인 시스템 (신뢰감·세련됨) ───────────────────────────────────── */
 :root {
   color-scheme: light;
-  --bg:        #f2f4f7;
+  --bg:        #f5f7fa;
+  --bg-subtle: #f0f2f5;
   --card:      #ffffff;
-  --border:    #e4e8ee;
-  --txt1:      #0d1117;
-  --txt2:      #5a6478;
-  --txt3:      #9aa3b2;
-  --primary:   #0d7f8a;
-  --sidebar:   #0a1628;
-  --sidebar2:  #0e1f38;
+  --border:    #e2e6ec;
+  --border-subtle: #eaedf1;
+  --txt1:      #0f172a;
+  --txt2:      #475569;
+  --txt3:      #94a3b8;
+  --primary:   #0a6b7c;
+  --primary-hover: #085a68;
+  --primary-soft: rgba(10,107,124,0.08);
+  --sidebar:   #0f172a;
+  --sidebar-hover: #1e293b;
+  --accent:    #0ea5e9;
+  --success:   #059669;
+  --warning:   #d97706;
+  --danger:    #dc2626;
+  /* 박스 배경 (섹션별) */
+  --box-info:  #f0f9ff;
+  --box-amber: #fffbeb;
+  --box-slate: #f8fafc;
+  /* 폰트 스케일 */
+  --text-xs:   11px;
+  --text-sm:   12px;
+  --text-base: 14px;
+  --text-lg:   16px;
+  --text-xl:   20px;
+  --text-2xl:  24px;
 }
 
 html, body {
@@ -25,10 +44,13 @@ html, body {
 body {
   background: var(--bg);
   color: var(--txt1);
-  font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", -apple-system, Arial, sans-serif;
-  font-size: 14px;
+  font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: var(--text-base);
+  font-weight: 400;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
 }
 
 /* ── 브라우저 기본 outline 제거 ──────────────────────────────────────────────── */
