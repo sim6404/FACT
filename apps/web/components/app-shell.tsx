@@ -31,7 +31,7 @@ import {
   RefreshCw, Download, Save, X, Printer, AlertTriangle,
   CheckCircle2, ArrowUpRight, ArrowDownRight, Settings,
   ChevronRight, MoreHorizontal, LogOut, Shield, User,
-  Cpu, FileSignature,
+  Cpu, FileSignature, BotMessageSquare,
 } from "lucide-react";
 import LoginPage, { type AuthUser } from "./LoginPage";
 import {
@@ -48,6 +48,7 @@ import QualitySection    from "./sections/QualitySection";
 import SalesSection      from "./sections/SalesSection";
 import PurchaseSection   from "./sections/PurchaseSection";
 import AislvinaSection   from "./sections/AislvinaSection";
+import AgentQuerySection  from "./sections/AgentQuerySection";
 import ReportSection     from "./sections/ReportSection";
 import ApprovalSection   from "./sections/ApprovalSection";
 import FileImportButton, { type ParsedRow } from "./FileImportButton";
@@ -55,7 +56,7 @@ import { DASHBOARD_KPIS, CUSTOMER_SALES } from "@/lib/fact-plan-data";
 
 // ─── types & mock data ────────────────────────────────────────────────────────
 
-type NavKey = "dashboard"|"production"|"quality"|"sales"|"purchase"|"aislvina"|"reports"|"approvals";
+type NavKey = "dashboard"|"production"|"quality"|"sales"|"purchase"|"aislvina"|"reports"|"approvals"|"query";
 
 interface SalesOrder { id:string;order_no:string;customer:string;product_name:string;order_qty:number;shipped_qty:number;order_date:string;due_date:string;status:string;amount:number;is_delayed:boolean; }
 interface PurchReq    { id:string;pr_no:string;material_name:string;qty:number;unit:string;required_date:string;status:string;requester:string;reason:string;vendor?:string; }
@@ -1344,13 +1345,14 @@ const NAV:[NavKey,string,React.ElementType][] = [
   ["sales","영업관리",ShoppingBag],
   ["purchase","구매/자재",Truck],
   ["aislvina","AISLVINA",Cpu],
+  ["query","AI 질의",BotMessageSquare],
   ["reports","보고서",FileBarChart2],
   ["approvals","승인",FileSignature],
 ];
 
-export default function AppShell() {
+export default function AppShell({ initialNav }: { initialNav?: NavKey } = {}) {
   const [authUser, setAuthUser] = useState<AuthUser | null>(null);
-  const [nav,setNav]   = useState<NavKey>("dashboard");
+  const [nav,setNav]   = useState<NavKey>(initialNav ?? "dashboard");
   const [inqs,setInqs] = useState<ProductionInquiry[]>([]);
   const [ncrs,setNcrs] = useState<QualityNCR[]>([]);
   const [ledg,setLedg] = useState<InventoryLedger[]>([]);
@@ -1401,6 +1403,7 @@ export default function AppShell() {
       case"sales":     return<SalesSection/>;
       case"purchase":  return<PurchaseSection/>;
       case"aislvina":  return<AislvinaSection/>;
+      case"query":     return<AgentQuerySection/>;
       case"reports":   return<ReportSection/>;
       case"approvals": return<ApprovalSection/>;
     }
